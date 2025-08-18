@@ -800,20 +800,24 @@ window.addEventListener("DOMContentLoaded", () => {
       // 🔥 强制刷新页面显示
       renderRound();
       renderLeaderboards();
-
+      return; // ⛔️ 这里 return，避免下面的 loadState() 把数据覆盖掉
     } catch (e) {
       console.error("❌ Failed to load shared state:", e);
     }
   }
 
+  // ✅ 普通加载时才用 localStorage
   loadState();
   renderRound();
   renderLeaderboards();
 });
 
+});
+
 </script>
 </body>
 </html>
+
 
 
 
