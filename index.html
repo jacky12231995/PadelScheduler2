@@ -712,31 +712,26 @@ document.getElementById("btnGenerateR1").addEventListener("click", generateR1);
   if (btn) btn.addEventListener("click", saveState);
 });
 document.getElementById("btnShare").addEventListener("click", () => {
-  const url = getShareURL();
-
-  if (!url || typeof url !== "string") {
-    alert("生成分享链接失败，请检查 STATE");
-    return;
-  }
+  const url = window.location.href; // 用当前页面URL，不加STATE
 
   const qrContainer = document.getElementById("qrcode");
-  qrContainer.innerHTML = ""; // 清空旧二维码
+  qrContainer.innerHTML = ""; 
 
   try {
     new QRCode(qrContainer, {
       text: url,
       width: 180,
       height: 180,
-      colorDark: "#ffffff",   // 二维码白色（跟深色背景更搭配）
-      colorLight: "transparent", // 背景透明
+      colorDark: "#000000",
+      colorLight: "#ffffff",
       correctLevel: QRCode.CorrectLevel.H
     });
     console.log("✅ QR 生成成功:", url);
   } catch (err) {
     console.error("❌ QR 生成失败:", err, "URL=", url);
-    alert("二维码生成失败，请查看 Console");
   }
 });
+
 
 
 document.getElementById("btnBuildNextRound").addEventListener("click", buildNextRound);
@@ -768,6 +763,7 @@ if (params.has("state")) {
 </script>
 </body>
 </html>
+
 
 
 
