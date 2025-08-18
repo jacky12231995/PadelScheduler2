@@ -193,34 +193,6 @@ input:disabled, select:disabled, textarea:disabled {
 </div>
 
 <script>
-/* ================
-   渲染某一轮赛程
-   ================ */
-function renderRound(court, round){
-  const tbl = document.getElementById(court==="A" ? "tblA" : "tblB").querySelector("tbody");
-  tbl.innerHTML = "";
-
-  (STATE.matches[round]?.[court] || []).forEach((match, idx) => {
-    const tr = document.createElement("tr");
-
-    const res = STATE.results[round]?.[court]?.[idx] || {};
-
-    tr.innerHTML = `
-      <td>${idx+1}</td>
-      <td>${match.t1 ? match.t1.join(" & ") : ""}</td>
-      <td>${match.t2 ? match.t2.join(" & ") : ""}</td>
-      <td><input type="number" min="0" class="input scoreInput" data-r="${round}" data-c="${court}" data-i="${idx}" data-side="1" value="${res.g1 ?? ""}"></td>
-      <td><input type="number" min="0" class="input scoreInput" data-r="${round}" data-c="${court}" data-i="${idx}" data-side="2" value="${res.g2 ?? ""}"></td>
-      <td>${
-        res.g1!=null && res.g2!=null
-          ? (res.g1 > res.g2 ? "T1" : "T2")
-          : `<span class="badge badge-pending">Pending</span>`
-      }</td>
-    `;
-
-    tbl.appendChild(tr);
-  });
-}
 
 /* =========================
    State
@@ -800,7 +772,7 @@ window.addEventListener("DOMContentLoaded", () => {
       // 🔥 强制刷新页面显示
       renderRound();
       renderLeaderboards();
-      return; // ⛔️ 这里 return，避免下面的 loadState() 把数据覆盖掉
+      return; // ⛔️ 避免被 loadState() 覆盖
     } catch (e) {
       console.error("❌ Failed to load shared state:", e);
     }
@@ -810,11 +782,13 @@ window.addEventListener("DOMContentLoaded", () => {
   loadState();
   renderRound();
   renderLeaderboards();
-});
+});   // ✅ 结束 DOMContentLoaded
+
 
 </script>
 </body>
 </html>
+
 
 
 
