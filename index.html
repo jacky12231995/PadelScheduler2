@@ -6,6 +6,7 @@
 <title>Padel Scheduler — Multi Court (≥5 players)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   :root { --card: #ffffff; --muted: #64748b; }
   body {
   background: url("assets/background.png") no-repeat center center fixed;
@@ -101,10 +102,13 @@ input:disabled, select:disabled, textarea:disabled {
       <h1 class="text-2xl font-bold">Padel Scheduler</h1>
       <p class="text-sm text-slate-500">Supports ≥5 players · choose 1 or 2 courts · per-round balanced doubles</p>
     </div>
-    <div class="flex gap-2">
-      <button id="btnExportCSV" class="btn">Export Overall CSV</button>
-      <button id="btnReset" class="btn">Reset</button>
-    </div>
+   <div class="flex gap-2">
+  <button id="btnExportCSV" class="btn">Export Overall CSV</button>
+  <button id="btnReset" class="btn">Reset</button>
+  <button id="btnShare" class="btn">Share via QR</button>
+</div>
+<div id="qrcode" class="mt-2"></div>
+
   </header>
 
   <!-- Settings -->
@@ -630,6 +634,7 @@ function resubmitScores(){
 /* =========================
    保存与加载 State
    ========================= */
+  
 function saveState() {
   localStorage.setItem("padelSchedulerState", JSON.stringify(STATE));
 }
@@ -644,7 +649,15 @@ function loadState() {
       console.error("Failed to load state:", e);
     }
   }
+}/* =========================
+   分享链接 & 生成二维码
+   ========================= */
+function getShareURL() {
+  const stateStr = JSON.stringify(STATE);
+  const encoded = encodeURIComponent(btoa(stateStr));
+  return `${window.location.origin}${window.location.pathname}?state=${encoded}`;
 }
+
 
 /* Reset */
 function resetAll(){
@@ -695,6 +708,16 @@ document.getElementById("btnGenerateR1").addEventListener("click", generateR1);
   const btn = document.getElementById(id);
   if (btn) btn.addEventListener("click", saveState);
 });
+document.getElementById("btnShare").addEventListener("click", () => {
+  const url = getShareURL();
+  const qrContainer = document.getElementById("qrcode");
+  qrContainer.innerHTML = ""; // 清空旧的二维码
+  new QRCode(qrContainer, {
+    text: url,
+    width: 180,
+    height: 180
+  });
+});
 
 document.getElementById("btnBuildNextRound").addEventListener("click", buildNextRound);
 document.getElementById("btnSubmit").addEventListener("click", submitScores);
@@ -706,6 +729,17 @@ document.getElementById("btnReset").addEventListener("click", resetAll);
 /* Demo seed */
 document.getElementById("playersInput").value = ["Alice","Bob","Carol","Dave","Eve","Frank","Grace"].join(", ");
 window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+if (params.has("state")) {
+  try {
+    const decoded = atob(decodeURIComponent(params.get("state")));
+    const parsed = JSON.parse(decoded);
+    Object.assign(STATE, parsed);
+  } catch (e) {
+    console.error("Failed to load shared state:", e);
+  }
+}
+
   loadState();
   renderRound();
   renderLeaderboards();
@@ -714,6 +748,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
