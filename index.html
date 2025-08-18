@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Padel Scheduler — Multi Court (≥5 players)</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <style>
   :root { --card: #ffffff; --muted: #64748b; }
   body {
@@ -657,8 +658,9 @@ function loadState() {
    ========================= */
 function getShareURL() {
   const stateStr = JSON.stringify(STATE);
-  const encoded = encodeURIComponent(btoa(stateStr));
-  return `${window.location.origin}${window.location.pathname}?state=${encoded}`;
+  // 压缩并转成 base64
+  const compressed = LZString.compressToEncodedURIComponent(stateStr);
+  return `${window.location.origin}${window.location.pathname}?state=${compressed}`;
 }
 
 
@@ -747,13 +749,17 @@ window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
 if (params.has("state")) {
   try {
-    const decoded = atob(decodeURIComponent(params.get("state")));
-    const parsed = JSON.parse(decoded);
-    Object.assign(STATE, parsed);
+    const compressed = params.get("state");
+    const jsonStr = LZString.decompressFromEncodedURIComponent(compressed);
+    if (jsonStr) {
+      const parsed = JSON.parse(jsonStr);
+      Object.assign(STATE, parsed);
+    }
   } catch (e) {
     console.error("Failed to load shared state:", e);
   }
 }
+
 
   loadState();
   renderRound();
@@ -763,6 +769,7 @@ if (params.has("state")) {
 </script>
 </body>
 </html>
+
 
 
 
