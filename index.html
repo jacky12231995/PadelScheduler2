@@ -760,26 +760,24 @@ window.addEventListener("DOMContentLoaded", () => {
       const restored = pako.inflate(compressed, { to: "string" });
       const parsed = JSON.parse(restored);
       Object.assign(STATE, parsed);
-      console.log("✅ State restored from QR", STATE);
+console.log("✅ State restored from QR", STATE);
 
-      // 🔥 同步 UI 输入框
-      document.getElementById("playersInput").value = STATE.players.join(", ");
-      document.getElementById("matchesPerPlayer").value = STATE.matchesPerPlayer;
-      document.getElementById("courtMode").value = STATE.courtMode;
-      document.getElementById("strategy").value = STATE.strategy;
-      document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
+// 🔥 同步 UI 输入框
+document.getElementById("playersInput").value = STATE.players.join(", ");
+document.getElementById("matchesPerPlayer").value = STATE.matchesPerPlayer;
+document.getElementById("courtMode").value = STATE.courtMode;
+document.getElementById("strategy").value = STATE.strategy;
+document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
 
-      STATE.round = parsed.round || 1;
+STATE.round = parsed.round || 1;
 
-      // 🔥 强制刷新页面显示
-      scheduleCurrent(); // 重新生成比赛表
-      renderRound();
-      renderLeaderboards();
-      return; // ⛔️ 避免被 loadState() 覆盖
-    } catch (e) {
-      console.error("❌ Failed to load shared state:", e);
-    }
-  }
+// 🚫 不要再调用 scheduleCurrent()
+// 直接渲染
+renderRound();
+renderLeaderboards();
+
+return; // ⛔️ 避免被 loadState() 覆盖
+
 
   // ✅ 普通加载时才用 localStorage
   loadState();
@@ -791,6 +789,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
