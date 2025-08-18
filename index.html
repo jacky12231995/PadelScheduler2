@@ -780,21 +780,31 @@ document.getElementById("btnReset").addEventListener("click", resetAll);
 /* Demo seed */
 document.getElementById("playersInput").value = ["Alice","Bob","Carol","Dave","Eve","Frank","Grace"].join(", ");
 window.addEventListener("DOMContentLoaded", () => {
- const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search);
   if (params.has("state")) {
-  try {
-    const encoded = params.get("state");
-    const compressed = base64ToUint8(encoded);
-    const restored = pako.inflate(compressed, { to: "string" });
-    const parsed = JSON.parse(restored);
-    Object.assign(STATE, parsed);
-    console.log("✅ State restored from QR", STATE);
-  } catch (e) {
-    console.error("❌ Failed to load shared state:", e);
+    try {
+      const encoded = params.get("state");
+      const compressed = base64ToUint8(encoded);
+      const restored = pako.inflate(compressed, { to: "string" });
+      const parsed = JSON.parse(restored);
+      Object.assign(STATE, parsed);
+      console.log("✅ State restored from QR", STATE);
+
+      // 🔥 同步 UI 输入框
+      document.getElementById("playersInput").value = STATE.players.join(", ");
+      document.getElementById("matchesPerPlayer").value = STATE.matchesPerPlayer;
+      document.getElementById("courtMode").value = STATE.courtMode;
+      document.getElementById("strategy").value = STATE.strategy;
+      document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
+
+      // 🔥 强制刷新页面显示
+      renderRound();
+      renderLeaderboards();
+
+    } catch (e) {
+      console.error("❌ Failed to load shared state:", e);
+    }
   }
-}
-
-
 
   loadState();
   renderRound();
@@ -804,6 +814,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
