@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Padel Scheduler — Multi Court (≥5 players)</title>
@@ -93,6 +92,10 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 </style>
+
+ <!-- ✅ 正确引入 QRCode 库 -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+ 
 </head>
 <body>
 <div class="max-w-6xl mx-auto p-4 space-y-6">
@@ -748,6 +751,7 @@ if (params.has("state")) {
 </script>
 </body>
 </html>
+
 
 
 
