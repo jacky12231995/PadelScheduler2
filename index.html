@@ -628,34 +628,17 @@ function loadState() {
 }/* =========================
    分享链接 & 生成二维码
    ========================= */
-function uint8ToBase64(u8Arr) {
-  let CHUNK_SIZE = 0x8000; // 32KB
-  let c = [];
-  for (let i = 0; i < u8Arr.length; i += CHUNK_SIZE) {
-    c.push(String.fromCharCode.apply(null, u8Arr.subarray(i, i +
-  CHUNK_SIZE)));
-    }
-  return btoa(c.join(""));
-}
-
-function base64ToUint8(base64) {
-  const binary = atob(base64);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-    return bytes;
-}
-  
 function getShareURL() {
-  const stateStr = JSON.stringify(STATE); // 🔥 保存完整 STATE
+  const stateStr = JSON.stringify(STATE);  
   const compressed = pako.deflate(stateStr);
   const encoded = uint8ToBase64(compressed);
-  return
-${window.location.origin}${window.location.pathname}?
-state=${encoded};
+
+  // 🔥 关键：URL 安全
+  const safe = encodeURIComponent(encoded);
+
+  return `${window.location.origin}${window.location.pathname}?state=${safe}`;
 }
+
   
 /* Reset */
 function resetAll(){
@@ -743,10 +726,12 @@ window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   if (params.has("state")) {
     try {
-      const encoded = params.get("state");
-      const compressed = base64ToUint8(encoded);
-      const restored = pako.inflate(compressed, { to: "string" });
-      const parsed = JSON.parse(restored);
+      const safe = params.get("state");
+const encoded = decodeURIComponent(safe);   // 🔥 关键
+const compressed = base64ToUint8(encoded);
+const restored = pako.inflate(compressed, { to: "string" });
+const parsed = JSON.parse(restored);
+
       Object.assign(STATE, parsed);
       console.log("✅ State restored from QR", STATE);
 
@@ -779,6 +764,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
