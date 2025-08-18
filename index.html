@@ -760,27 +760,37 @@ window.addEventListener("DOMContentLoaded", () => {
       const restored = pako.inflate(compressed, { to: "string" });
       const parsed = JSON.parse(restored);
       Object.assign(STATE, parsed);
-console.log("✅ State restored from QR", STATE);
+      console.log("✅ State restored from QR", STATE);
 
-// 🔥 同步 UI 输入框
-document.getElementById("playersInput").value = STATE.players.join(", ");
-document.getElementById("matchesPerPlayer").value = STATE.matchesPerPlayer;
-document.getElementById("courtMode").value = STATE.courtMode;
-document.getElementById("strategy").value = STATE.strategy;
-document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
+      // 🔥 同步 UI 输入框
+      document.getElementById("playersInput").value = STATE.players.join(", ");
+      document.getElementById("matchesPerPlayer").value = STATE.matchesPerPlayer;
+      document.getElementById("courtMode").value = STATE.courtMode;
+      document.getElementById("strategy").value = STATE.strategy;
+      document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
 
-STATE.round = parsed.round || 1;
+      STATE.round = parsed.round || 1;
 
-// 🚫 不要再调用 scheduleCurrent()
-// 直接渲染
-renderRound();
-renderLeaderboards();
+      // 🚫 不要再调用 scheduleCurrent()
+      renderRound();
+      renderLeaderboards();
 
-return; // ⛔️ 避免被 loadState() 覆盖
+      return; // ⛔️ 避免 loadState 覆盖
+    } catch(e) {
+      console.error("❌ Failed to parse state from QR:", e);
+    }
+  }
+
+  // ✅ 如果没有二维码参数，则从 localStorage 恢复
+  loadState();
+  renderRound();
+  renderLeaderboards();
+});
 
 </script>
 </body>
 </html>
+
 
 
 
