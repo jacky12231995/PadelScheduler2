@@ -778,17 +778,10 @@ renderLeaderboards();
 
 return; // ⛔️ 避免被 loadState() 覆盖
 
-
-  // ✅ 普通加载时才用 localStorage
-  loadState();
-  renderRound();
-  renderLeaderboards();
-});   // ✅ 结束 DOMContentLoaded
-
-
 </script>
 </body>
 </html>
+
 
 
 
