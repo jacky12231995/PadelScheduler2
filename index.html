@@ -676,11 +676,25 @@ function base64ToUint8(base64) {
 }
 
 function getShareURL() {
-  const stateStr = JSON.stringify(STATE);
-  const compressed = pako.deflate(stateStr); // Uint8Array
-  const encoded = uint8ToBase64(compressed); // ✅ 转 base64
+  const stateToSave = {
+    round: STATE.round,
+    players: STATE.players,
+    courts: STATE.courts,
+    matchesPerPlayer: STATE.matchesPerPlayer,
+    courtMode: STATE.courtMode,
+    strategy: STATE.strategy,
+    roster: STATE.roster,
+    matches: STATE.matches,
+    results: STATE.results,
+    submittedAt: STATE.submittedAt
+  };
+
+  const stateStr = JSON.stringify(stateToSave);
+  const compressed = pako.deflate(stateStr);
+  const encoded = uint8ToBase64(compressed);
   return `${window.location.origin}${window.location.pathname}?state=${encoded}`;
 }
+
 
 
 /* Reset */
@@ -789,6 +803,7 @@ const restored = pako.inflate(compressed, { to: "string" });
 </script>
 </body>
 </html>
+
 
 
 
