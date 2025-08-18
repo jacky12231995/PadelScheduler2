@@ -769,6 +769,8 @@ window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("strategy").value = STATE.strategy;
       document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
 
+      STATE.round = parsed.round || 1;
+
       // 🔥 强制刷新页面显示
       renderRound();
       renderLeaderboards();
@@ -780,6 +782,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // ✅ 普通加载时才用 localStorage
   loadState();
+  scheduleCurrent(); // 重新生成比赛表
   renderRound();
   renderLeaderboards();
 });   // ✅ 结束 DOMContentLoaded
@@ -788,6 +791,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
