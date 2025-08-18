@@ -714,7 +714,7 @@ document.getElementById("btnGenerateR1").addEventListener("click", generateR1);
   if (btn) btn.addEventListener("click", saveState);
 });
 document.getElementById("btnShare").addEventListener("click", () => {
-  const url = window.location.href; // 用当前页面URL，不加STATE
+  const url = getShareURL(); // ✅ 改成生成带压缩STATE的URL
 
   const qrContainer = document.getElementById("qrcode");
   qrContainer.innerHTML = ""; 
@@ -733,6 +733,7 @@ document.getElementById("btnShare").addEventListener("click", () => {
     console.error("❌ QR 生成失败:", err, "URL=", url);
   }
 });
+
 
 
 
@@ -769,6 +770,7 @@ if (params.has("state")) {
 </script>
 </body>
 </html>
+
 
 
 
