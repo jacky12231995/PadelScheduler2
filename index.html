@@ -234,6 +234,25 @@ function splitCourts(players, mode){
   return { A, B };
 }
 
+  function uint8ToBase64(u8) {
+  let binary = "";
+  const len = u8.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(u8[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToUint8(base64) {
+  const binary = atob(base64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
 /* =========================
    Optimized scheduling
    ========================= */
@@ -764,6 +783,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
