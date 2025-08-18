@@ -1,91 +1,109 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Padel Scheduler — 多场地 (≥5 玩家)</title>
+<title>Padel Scheduler — Multi Court (≥5 players)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  :root { 
-  --card: #1f2937;   
-  --muted: #9ca3af;  
+  :root { --card: #ffffff; --muted: #64748b; }
+  body {
+  background: url("assets/background.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #e5e7eb; /* 全局字体浅灰白 */
 }
-body { 
-  background: #0f172a;  
-  color:#f1f5f9;        
+
+/* 卡片容器 */
+.card {
+  background: rgba(15, 23, 42, 0.75); 
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  color: #f1f5f9;
+  font-weight: 500;
 }
-.card { 
-  background: var(--card); 
-  border-radius: 1rem; 
-  box-shadow: 0 1px 6px rgba(0,0,0,0.6); 
-  border: 1px solid #374151; 
+
+/* 按钮 */
+.btn {
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #f8fafc;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
 }
-.btn { 
-  border-radius: .6rem; 
-  padding: .5rem .9rem; 
-  font-weight: 600; 
-  border: 1px solid #374151; 
-  background: #111827; 
-  color:#f9fafb;
-  cursor:pointer; 
+.btn:hover {
+  background: rgba(51, 65, 85, 0.95);
+  transform: translateY(-2px);
 }
-.btn-primary { 
-  background: linear-gradient(180deg,#4f46e5,#4338ca); 
-  color:#fff; 
-  border:none; 
+
+/* 表格 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  color: #f9fafb; /* 表格文字改亮色 */
 }
-.input, .select, textarea { 
-  border: 1px solid #374151; 
-  border-radius: .6rem; 
-  padding: .55rem .7rem; 
-  width: 100%; 
-  box-sizing:border-box; 
-  background:#111827; 
-  color:#f9fafb; 
+.table th {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: #f9fafb;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.table { 
-  width:100%; 
-  border-collapse:collapse; 
-  font-size: .95rem; 
+.table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-th, td { 
-  text-align:left; 
-  padding:.5rem .6rem; 
-  border-bottom:1px solid #374151; 
-  vertical-align:top; 
+.table tbody tr:hover {
+  background: rgba(255,255,255,0.06);
 }
-thead th { 
-  text-transform:uppercase; 
-  font-size:.78rem; 
-  color:#9ca3af; 
-  background:#1e293b; 
+/* 输入框统一风格 */
+.input, textarea, select {
+  background: rgba(30, 41, 59, 0.85);  /* 深蓝灰底 */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  color: #f1f5f9;                      /* 浅灰白字体 */
+  font-size: 0.9rem;
+  width: 100%;
+  outline: none;
+  transition: all 0.2s ease-in-out;
 }
-.badge { 
-  display:inline-flex; 
-  align-items:center; 
-  padding:.18rem .5rem; 
-  border-radius:999px; 
-  font-weight:600; 
-  font-size:.78rem;
+.input:focus, textarea:focus, select:focus {
+  border-color: #3b82f6;               /* 聚焦时蓝色高亮 */
+  background: rgba(51, 65, 85, 0.95);
 }
-.badge-win { background:#166534; color:#dcfce7; }
-.badge-lose { background:#075985; color:#e0f2fe; }
-.badge-pending { background:#374151; color:#f1f5f9; }
+.scoreInput {
+  width: 4rem;
+  text-align: center;
+}
+
+/* 禁用的下拉/输入框 */
+input:disabled, select:disabled, textarea:disabled {
+  background: rgba(30, 41, 59, 0.6);
+  color: #94a3b8; /* 更浅的灰字 */
+  cursor: not-allowed;
+}
+
 </style>
 </head>
 <body>
 <div class="max-w-6xl mx-auto p-4 space-y-6">
 
-  <!-- Header -->
   <header class="flex items-center justify-between">
     <div>
-      <h1 id="title" class="text-2xl font-bold">Padel Scheduler 调度器</h1>
-      <p id="subtitle" class="text-sm text-slate-500">支持 ≥5 玩家 · 可选 1 或 2 个场地 · 每轮平衡双打</p>
+      <h1 class="text-2xl font-bold">Padel Scheduler</h1>
+      <p class="text-sm text-slate-500">Supports ≥5 players · choose 1 or 2 courts · per-round balanced doubles</p>
     </div>
     <div class="flex gap-2">
-      <button id="btnLang" class="btn">🌐 English</button>
-      <button id="btnExportCSV" class="btn">导出总表 / Export CSV</button>
-      <button id="btnReset" class="btn">重置 / Reset</button>
+      <button id="btnExportCSV" class="btn">Export Overall CSV</button>
+      <button id="btnReset" class="btn">Reset</button>
     </div>
   </header>
 
@@ -93,34 +111,34 @@ thead th {
   <section class="card p-4">
     <div class="grid md:grid-cols-4 gap-4">
       <div class="md:col-span-2">
-        <label id="lblPlayers" class="block text-sm font-medium mb-1">玩家列表 / Players (用逗号分隔)</label>
+        <label class="block text-sm font-medium mb-1">Players (comma-separated)</label>
         <textarea id="playersInput" rows="3" class="input" placeholder="Alice, Bob, Carol, Dave, Eve, ..."></textarea>
-        <p id="hintPlayers" class="text-xs text-slate-500 mt-1">至少 5 名玩家，允许奇数人数。</p>
+        <p class="text-xs text-slate-500 mt-1">Minimum 5 players. Odd counts are allowed (scheduler handles).</p>
       </div>
 
       <div>
-        <label id="lblMatches" class="block text-sm font-medium mb-1">每位玩家的场次 / Matches per player</label>
+        <label class="block text-sm font-medium mb-1">Matches per player (per round)</label>
         <input id="matchesPerPlayer" type="number" min="1" max="8" value="4" class="input">
       </div>
 
       <div>
-        <label id="lblCourtMode" class="block text-sm font-medium mb-1">场地模式 / Court Mode</label>
+        <label class="block text-sm font-medium mb-1">Court Mode</label>
         <select id="courtMode" class="input">
-          <option value="1">1 场地（全部在 A 场地 / All in Court A）</option>
-          <option value="2" selected>2 场地（分配 A & B / Split A & B）</option>
+          <option value="1">1 Court (All players in Court A)</option>
+          <option value="2" selected>2 Courts (Split A & B)</option>
         </select>
       </div>
 
       <div>
-        <label id="lblStrategy" class="block text-sm font-medium mb-1">下一轮策略 / Next-round strategy</label>
+        <label class="block text-sm font-medium mb-1">Next-round strategy</label>
         <select id="strategy" class="input">
-          <option value="winnersTogether">胜者 → A 场，负者 → B 场 / Winners → A, Losers → B</option>
-          <option value="winnersDistributed">均匀分配胜者 / Distribute winners evenly</option>
+          <option value="winnersTogether">Winners → Court A, Losers → Court B</option>
+          <option value="winnersDistributed">Distribute winners evenly</option>
         </select>
       </div>
 
       <div class="md:col-span-4">
-        <button id="btnGenerateR1" class="btn btn-primary mt-2">生成第 1 轮 / Generate Round 1</button>
+        <button id="btnGenerateR1" class="btn btn-primary mt-2">Generate Round 1</button>
       </div>
     </div>
   </section>
@@ -129,22 +147,22 @@ thead th {
   <section class="grid md:grid-cols-2 gap-6">
     <div class="card p-4">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="font-semibold" id="roundALabel">第 <span id="labelRoundA">1</span> 轮 — A 场 / Round</h2>
-        <button id="btnBuildNextRound" class="btn btn-primary">生成下一轮 / Build Next Round</button>
+        <h2 class="font-semibold">Round <span id="labelRoundA">1</span> — Court A</h2>
+        <button id="btnBuildNextRound" class="btn btn-primary">Build Next Round</button>
       </div>
       <div class="overflow-x-auto">
         <table class="table" id="tblA">
-          <thead><tr><th>#</th><th>队伍 1 / Team 1</th><th>队伍 2 / Team 2</th><th>队伍1得分 / T1 Games</th><th>队伍2得分 / T2 Games</th><th>胜者 / Winner</th></tr></thead>
+          <thead><tr><th>#</th><th>Team 1</th><th>Team 2</th><th>T1 Games</th><th>T2 Games</th><th>Winner</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
 
     <div class="card p-4" id="courtBCard">
-      <h2 class="font-semibold mb-3" id="roundBLabel">第 <span id="labelRoundB">1</span> 轮 — B 场 / Round</h2>
+      <h2 class="font-semibold mb-3">Round <span id="labelRoundB">1</span> — Court B</h2>
       <div class="overflow-x-auto">
         <table class="table" id="tblB">
-          <thead><tr><th>#</th><th>队伍 1 / Team 1</th><th>队伍 2 / Team 2</th><th>队伍1得分 / T1 Games</th><th>队伍2得分 / T2 Games</th><th>胜者 / Winner</th></tr></thead>
+          <thead><tr><th>#</th><th>Team 1</th><th>Team 2</th><th>T1 Games</th><th>T2 Games</th><th>Winner</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -154,11 +172,11 @@ thead th {
   <!-- Leaderboards -->
   <section class="card p-4">
     <div class="flex items-center justify-between mb-3">
-      <h2 class="font-semibold" id="lbTitle">排行榜 / Leaderboards</h2>
+      <h2 class="font-semibold">Leaderboards</h2>
       <div class="flex gap-2">
-        <button id="btnSubmit" class="btn">提交成绩 / Submit</button>
-        <button id="btnResubmit" class="btn">重新提交 / Resubmit</button>
-        <button id="btnRecalcLB" class="btn">重新计算 / Recalculate</button>
+        <button id="btnSubmit" class="btn">Submit Scores</button>
+        <button id="btnResubmit" class="btn">Resubmit</button>
+        <button id="btnRecalcLB" class="btn">Recalculate</button>
       </div>
     </div>
     <div id="lbPanels" class="space-y-6"></div>
@@ -166,32 +184,530 @@ thead th {
 
 </div>
 
-<!-- 原来的脚本逻辑保持不变 -->
 <script>
-// 保留你原本的所有调度逻辑，这里只加一个语言切换
-const i18n = {
-  zh: {
-    title: "Padel Scheduler 调度器",
-    subtitle: "支持 ≥5 玩家 · 可选 1 或 2 个场地 · 每轮平衡双打",
-    btnLang: "🌐 English"
-  },
-  en: {
-    title: "Padel Scheduler",
-    subtitle: "Supports ≥5 players · choose 1 or 2 courts · per-round balanced doubles",
-    btnLang: "🌐 中文"
-  }
+/* ================
+   渲染某一轮赛程
+   ================ */
+function renderRound(court, round){
+  const tbl = document.getElementById(court==="A" ? "tblA" : "tblB").querySelector("tbody");
+  tbl.innerHTML = "";
+
+  (STATE.matches[round]?.[court] || []).forEach((match, idx) => {
+    const tr = document.createElement("tr");
+
+    const res = STATE.results[round]?.[court]?.[idx] || {};
+
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td>${match.t1 ? match.t1.join(" & ") : ""}</td>
+      <td>${match.t2 ? match.t2.join(" & ") : ""}</td>
+      <td><input type="number" min="0" class="input scoreInput" data-r="${round}" data-c="${court}" data-i="${idx}" data-side="1" value="${res.g1 ?? ""}"></td>
+      <td><input type="number" min="0" class="input scoreInput" data-r="${round}" data-c="${court}" data-i="${idx}" data-side="2" value="${res.g2 ?? ""}"></td>
+      <td>${
+        res.g1!=null && res.g2!=null
+          ? (res.g1 > res.g2 ? "T1" : "T2")
+          : `<span class="badge badge-pending">Pending</span>`
+      }</td>
+    `;
+
+    tbl.appendChild(tr);
+  });
+}
+
+/* =========================
+   State
+   ========================= */
+const STATE = {
+  round: 1,
+  players: [],
+  courts: { A: [], B: [] },
+  matchesPerPlayer: 4,
+  courtMode: "2",
+  strategy: "winnersTogether",
+  roster: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
+  matches: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
+  results: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
+  submittedAt: {}
 };
-let currentLang = "zh";
-document.getElementById("btnLang").addEventListener("click", () => {
-  currentLang = currentLang === "zh" ? "en" : "zh";
-  const t = i18n[currentLang];
-  document.getElementById("title").textContent = t.title;
-  document.getElementById("subtitle").textContent = t.subtitle;
-  document.getElementById("btnLang").textContent = t.btnLang;
+
+/* =========================
+   Utilities
+   ========================= */
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function keyPair(a,b){ return [a,b].sort().join("|"); }
+
+/* Validate players - allow >=5 (odd OK) */
+function ensureMinPlayers(list){
+  const trimmed = list.map(s=>s.trim()).filter(Boolean);
+  if (trimmed.length < 5) throw new Error("Please enter at least 5 players.");
+  return trimmed;
+}
+
+/* Split into courts */
+function splitCourts(players, mode){
+  const p = shuffle(players);
+  if (mode === "1") return { A: p.slice(), B: [] };
+  const mid = Math.ceil(p.length / 2);
+  let A = p.slice(0, mid), B = p.slice(mid);
+  if (A.length < 2 && B.length >= 2) A.push(B.pop());
+  if (B.length < 2 && A.length >= 2) B.push(A.pop());
+  return { A, B };
+}
+
+/* =========================
+   Optimized scheduling
+   ========================= */
+function scheduleCourt(players, K) {
+  const N = players.length;
+  if (N < 4) return []; // UI 会在 2 场地模式下自动回退到 1 场地
+
+  // 计算总场次数与每人目标至少 K，可能有少数人 K+1（使总出场数能被4整除）
+  const spotsMin = K * N;
+  const matchesNeeded = Math.ceil(spotsMin / 4);
+  const totalSpots = matchesNeeded * 4;             // 实际要分配的“上场位”
+  const extras = totalSpots - spotsMin;             // 0~3
+  const shuffled = shuffle(players);
+
+  const target = {};  // 目标出场次数（K 或 K+1）
+  const need = {};    // 剩余需要的次数
+  const apps = {};    // 实际已安排次数（用于挑“垫场队员”）
+  for (let i=0;i<N;i++){
+    const p = shuffled[i];
+    target[p] = K + (i < extras ? 1 : 0);
+    need[p] = target[p];
+    apps[p] = 0;
+  }
+
+  // 记录搭档/对手，尽量减少重复
+  const partnerCount = new Map();
+  const vsCount = {};
+  players.forEach(p => vsCount[p] = {});
+
+  const matches = [];
+  let guard = 0;
+
+  function pickFour(){
+    // 先选 need>0 的，优先 need 高、apps 低
+    const needers = players
+      .filter(p => need[p] > 0)
+      .sort((a,b) => (need[b]-need[a]) || (apps[a]-apps[b]) || a.localeCompare(b));
+
+    let pick = needers.slice(0,4);
+
+    // 不足4个，用“垫场队员”补齐：优先 apps 少、且没有被选中过
+    if (pick.length < 4){
+      const boosters = players
+        .filter(p => !pick.includes(p))
+        .sort((a,b) => (apps[a]-apps[b]) || (need[b]-need[a]) || a.localeCompare(b));
+      for (const p of boosters){
+        pick.push(p);
+        if (pick.length === 4) break;
+      }
+    }
+    return pick.length === 4 ? pick : [];
+  }
+
+  while (Object.values(need).some(v=>v>0) && guard++ < 5000){
+    const cand = pickFour();
+    if (cand.length < 4) break;
+
+    // 三种可能的搭配，选重复最少的
+    const partitions = [
+      [[cand[0], cand[1]], [cand[2], cand[3]]],
+      [[cand[0], cand[2]], [cand[1], cand[3]]],
+      [[cand[0], cand[3]], [cand[1], cand[2]]]
+    ];
+
+    let best = null, bestScore = Infinity;
+    for (const [t1, t2] of partitions) {
+      const pk1 = keyPair(t1[0], t1[1]);
+      const pk2 = keyPair(t2[0], t2[1]);
+      let score = (partnerCount.get(pk1) || 0) * 100 + (partnerCount.get(pk2) || 0) * 100;
+      for (const a of t1) for (const b of t2) score += (vsCount[a][b] || 0) * 10;
+      if (score < bestScore) { bestScore = score; best = { t1, t2 }; }
+    }
+
+    matches.push(best);
+
+    // 更新计数
+    const four = [...best.t1, ...best.t2];
+    for (const p of four){
+      apps[p] += 1;
+      if (need[p] > 0) need[p] -= 1; // 只有未达标的人才扣 need
+    }
+
+    const pk1 = keyPair(best.t1[0], best.t1[1]);
+    const pk2 = keyPair(best.t2[0], best.t2[1]);
+    partnerCount.set(pk1, (partnerCount.get(pk1)||0)+1);
+    partnerCount.set(pk2, (partnerCount.get(pk2)||0)+1);
+    for (const a of best.t1) for (const b of best.t2) {
+      vsCount[a][b] = (vsCount[a][b]||0) + 1;
+      vsCount[b][a] = (vsCount[b][a]||0) + 1;
+    }
+  }
+
+  return matches;
+}
+
+/* =========================
+   Render: rounds & leaderboards
+   ========================= */
+function renderRound(){
+  document.getElementById("labelRoundA").textContent = STATE.round;
+  document.getElementById("labelRoundB").textContent = STATE.round;
+  renderCourt("A","tblA");
+  if (STATE.courtMode === "2") renderCourt("B","tblB");
+}
+function renderCourt(court, tableId){
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = "";
+  const matches = STATE.matches[STATE.round][court] || [];
+  matches.forEach((m, idx) => {
+    const res = (STATE.results[STATE.round][court]||[])[idx] || { g1:"", g2:"" };
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td>${(m.t1||[]).join(" & ")}</td>
+      <td>${(m.t2||[]).join(" & ")}</td>
+      <td><input data-which="g1" data-court="${court}" data-idx="${idx}" type="number" min="0" class="input" style="width:5.5rem" value="${res.g1}"></td>
+      <td><input data-which="g2" data-court="${court}" data-idx="${idx}" type="number" min="0" class="input" style="width:5.5rem" value="${res.g2}"></td>
+      <td>${winnerBadge(res.g1, res.g2)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // attach listeners
+  tbody.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const court = e.target.dataset.court, idx = +e.target.dataset.idx, which = e.target.dataset.which;
+      STATE.results[STATE.round][court] = STATE.results[STATE.round][court] || [];
+      STATE.results[STATE.round][court][idx] = STATE.results[STATE.round][court][idx] || { g1:"", g2:"" };
+      STATE.results[STATE.round][court][idx][which] = e.target.value === "" ? "" : +e.target.value;
+      renderCourt(court, tableId);
+      renderLeaderboards();
+    });
+  });
+}
+function winnerBadge(g1,g2){
+  if (g1 === "" || g2 === "") return `<span class="badge badge-pending">—</span>`;
+  if (+g1 > +g2) return `<span class="badge badge-win">Team 1</span>`;
+  if (+g2 > +g1) return `<span class="badge badge-lose">Team 2</span>`;
+  return `<span class="badge badge-pending">Tie</span>`;
+}
+
+/* Leaderboards */
+function calcRoundStats(round){
+  const stats = {};
+  const roster = STATE.roster[round] || { A:[], B:[] };
+  function courtOf(p){ return roster.A.includes(p) ? "A" : (roster.B.includes(p) ? "B" : "-"); }
+  ["A","B"].forEach(court => {
+    const matches = STATE.matches[round][court] || [];
+    const res = STATE.results[round][court] || [];
+    matches.forEach((m, i) => {
+      const g1 = res[i]?.g1, g2 = res[i]?.g2;
+      (m.t1||[]).forEach(p => { stats[p] = stats[p] || { pts:0, apps:0, court: courtOf(p) }; stats[p].apps++; if (g1 !== "") stats[p].pts += +g1; });
+      (m.t2||[]).forEach(p => { stats[p] = stats[p] || { pts:0, apps:0, court: courtOf(p) }; stats[p].apps++; if (g2 !== "") stats[p].pts += +g2; });
+    });
+  });
+  STATE.players.forEach(p => { if (!stats[p]) stats[p] = { pts:0, apps:0, court: (STATE.roster[round]?.A.includes(p) ? "A" : (STATE.roster[round]?.B.includes(p)? "B":"-")) }; });
+  return stats;
+}
+function renderLeaderboards(){
+  const host = document.getElementById("lbPanels"); host.innerHTML = "";
+  for (let r=1; r<=4; r++) host.appendChild(renderRoundBoard(r));
+  host.appendChild(renderOverallBoard());
+}
+function renderRoundBoard(r){
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<h3 class="font-semibold">Round ${r} Leaderboard</h3>`;
+  const table = document.createElement("table"); table.className = "table mt-2";
+  table.innerHTML = `<thead><tr><th>#</th><th>Player</th><th>Court</th><th>Pts</th><th>Apps</th></tr></thead><tbody></tbody>`;
+  wrap.appendChild(table);
+  const tb = table.querySelector("tbody");
+  const st = calcRoundStats(r);
+  const rows = Object.keys(st).map(p => ({ player: p, ...st[p] })).sort((a,b) => b.pts - a.pts || a.player.localeCompare(b.player));
+  rows.forEach((row, i) => {
+    const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
+    tb.innerHTML += `<tr><td>${i+1}</td><td>${cup}${row.player}</td><td>${row.court||"-"}</td><td>${row.pts}</td><td>${row.apps}</td></tr>`;
+  });
+  return wrap;
+}
+function renderOverallBoard(){
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<h3 class="font-semibold">Overall Leaderboard</h3>`;
+  const table = document.createElement("table"); table.className = "table mt-2";
+  table.innerHTML = `<thead><tr><th>#</th><th>Player</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>Total</th></tr></thead><tbody></tbody>`;
+  wrap.appendChild(table);
+  const tb = table.querySelector("tbody");
+
+  const per = {};
+  STATE.players.forEach(p => per[p] = { r: [{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0}] });
+
+  for (let r=1; r<=4; r++){
+    const st = calcRoundStats(r);
+    STATE.players.forEach(p => per[p].r[r-1] = st[p] ? { pts: st[p].pts, apps: st[p].apps } : { pts:0, apps:0 } );
+  }
+
+  const rows = STATE.players.map(p => {
+    const r1=per[p].r[0], r2=per[p].r[1], r3=per[p].r[2], r4=per[p].r[3];
+    const total = r1.pts + r2.pts + r3.pts + r4.pts;
+    return { player: p, r1, r2, r3, r4, total };
+  }).sort((a,b) => b.total - a.total || a.player.localeCompare(b.player));
+
+  rows.forEach((row, i) => {
+    const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
+    tb.innerHTML += `<tr><td>${i+1}</td><td>${cup}${row.player}</td><td>${row.r1.pts}</td><td>${row.r2.pts}</td><td>${row.r3.pts}</td><td>${row.r4.pts}</td><td class="font-semibold">${row.total}</td></tr>`;
+  });
+  return wrap;
+}
+
+/* =========================
+   Export CSV (Overall)
+   ========================= */
+function exportCSV(){
+  const rows = [];
+  const header = ["#", "Player", "R1 Pts", "R1 Apps", "R2 Pts", "R2 Apps", "R3 Pts", "R3 Apps", "R4 Pts", "R4 Apps", "Total"];
+  rows.push(header);
+  const per = {};
+  STATE.players.forEach(p => per[p] = { r: [{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0}] });
+  for (let r=1;r<=4;r++){
+    const st = calcRoundStats(r);
+    STATE.players.forEach(p => per[p].r[r-1] = st[p] ? { pts: st[p].pts, apps: st[p].apps } : { pts:0, apps:0 } );
+  }
+  const list = STATE.players.map(p => {
+    const r1=per[p].r[0], r2=per[p].r[1], r3=per[p].r[2], r4=per[p].r[3];
+    const total = r1.pts + r2.pts + r3.pts + r4.pts;
+    return [p, r1.pts, r1.apps, r2.pts, r2.apps, r3.pts, r3.apps, r4.pts, r4.apps, total];
+  }).sort((a,b) => b[9]-a[9] || a[0].localeCompare(b[0]));
+  list.forEach((r,i)=> rows.push([i+1, ...r]));
+  const csv = rows.map(r => r.map(c => { const s = String(c); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "Overall_Leaderboard.csv"; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+}
+
+/* =========================
+   Generate / Build / Submit / Resubmit
+   ========================= */
+function scheduleCurrent(){
+  const r = STATE.round;
+  const K = STATE.matchesPerPlayer;
+  STATE.matches[r].A = scheduleCourt(STATE.courts.A, K) || [];
+  STATE.results[r].A = STATE.matches[r].A.map(()=>({ g1:"", g2:"" }));
+  if (STATE.courtMode === "2"){
+    STATE.matches[r].B = scheduleCourt(STATE.courts.B, K) || [];
+    STATE.results[r].B = STATE.matches[r].B.map(()=>({ g1:"", g2:"" }));
+  } else {
+    STATE.matches[r].B = []; STATE.results[r].B = [];
+  }
+  STATE.roster[r] = { A: [...STATE.courts.A], B: [...STATE.courts.B] };
+}
+
+function generateR1(){
+  try {
+    const raw = document.getElementById("playersInput").value.split(",");
+    const players = ensureMinPlayers(raw);
+    STATE.players = players;
+    STATE.matchesPerPlayer = Math.max(1, Math.min(8, +document.getElementById("matchesPerPlayer").value || 4));
+    STATE.courtMode = document.getElementById("courtMode").value;
+    STATE.strategy = document.getElementById("strategy").value;
+    STATE.round = 1;
+    STATE.courts = splitCourts(players, STATE.courtMode);
+
+    // 2 场地但某场地 < 4 人 → 自动回退到 1 场地
+    if (STATE.courtMode === "2" && (STATE.courts.A.length < 4 || STATE.courts.B.length < 4)){
+      alert("Two-court split produced a court with fewer than 4 players — automatically switching to 1 court mode for this generation.");
+      STATE.courtMode = "1";
+      document.getElementById("courtMode").value = "1";
+      document.getElementById("courtBCard").style.display = "none";
+      STATE.courts = { A: players.slice(), B: [] };
+    } else {
+      document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
+    }
+
+    scheduleCurrent();
+    renderRound();
+    renderLeaderboards();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+function buildNextRound(){
+  if (STATE.round >= 4) { alert("Already at round 4 (max)."); return; }
+
+  function rankCourt(court){
+    const r = STATE.round;
+    const totals = new Map();
+    (STATE.courts[court]||[]).forEach(p => totals.set(p, 0));
+    const matches = STATE.matches[r][court] || [];
+    const res = STATE.results[r][court] || [];
+    for (let i=0;i<matches.length;i++){
+      const m = matches[i]; const g1 = res[i]?.g1; const g2 = res[i]?.g2;
+      if (g1 === "" || g2 === "") continue;
+      (m.t1||[]).forEach(p => totals.set(p, (totals.get(p)||0) + (+g1 || 0)));
+      (m.t2||[]).forEach(p => totals.set(p, (totals.get(p)||0) + (+g2 || 0)));
+    }
+    return [...totals.entries()].map(([name, pts]) => ({ name, pts })).sort((a,b) => b.pts - a.pts);
+  }
+
+  const A = rankCourt("A"), B = rankCourt("B");
+  let nextA = [], nextB = [];
+
+  if (STATE.courtMode === "1"){
+    nextA = [...A.map(x=>x.name), ...B.map(x=>x.name)];
+    if (nextA.length === 0) nextA = STATE.players.slice();
+    const missing = STATE.players.filter(p => !nextA.includes(p));
+    nextA.push(...missing);
+    STATE.round += 1;
+    STATE.courts.A = nextA; STATE.courts.B = [];
+    scheduleCurrent(); renderRound(); renderLeaderboards();
+    return;
+  }
+
+  const strat = STATE.strategy || "winnersTogether";
+  if (strat === "winnersTogether"){
+    const topA = Math.ceil(A.length/2), topB = Math.ceil(B.length/2);
+    nextA = [...A.slice(0, topA).map(x=>x.name), ...B.slice(0, topB).map(x=>x.name)];
+    nextB = [...A.slice(topA).map(x=>x.name), ...B.slice(topB).map(x=>x.name)];
+  } else {
+    const winners = [...A.slice(0,Math.ceil(A.length/2)).map(x=>x.name), ...B.slice(0,Math.ceil(B.length/2)).map(x=>x.name)];
+    const losers = [...A.slice(Math.ceil(A.length/2)).map(x=>x.name), ...B.slice(Math.ceil(B.length/2)).map(x=>x.name)];
+    shuffle(winners).forEach((p,i) => (i%2===0 ? nextA : nextB).push(p));
+    const pool = shuffle(losers);
+    while (pool.length) (nextA.length <= nextB.length ? nextA : nextB).push(pool.shift());
+  }
+
+  nextA = [...new Set(nextA)]; nextB = [...new Set(nextB)];
+  const missing = STATE.players.filter(p => !nextA.includes(p) && !nextB.includes(p));
+  shuffle(missing).forEach(p => (nextA.length <= nextB.length ? nextA : nextB).push(p));
+
+  const total = nextA.length + nextB.length;
+  const targetA = Math.floor(total / 2);
+  while (nextA.length > targetA) nextB.push(nextA.pop());
+  while (nextA.length < targetA) nextA.push(nextB.pop());
+
+  if (nextA.length % 2) nextB.push(nextA.pop());
+  if (nextB.length % 2) nextA.push(nextB.pop());
+
+  // 若某场地 < 4，提示是否回退到 1 场地
+  if (nextA.length < 4 || nextB.length < 4){
+    if (confirm("Next-round split would create a court with fewer than 4 players. Switch to 1 court for next round? (OK = switch, Cancel = abort)")){
+      STATE.round += 1;
+      STATE.courtMode = "1";
+      document.getElementById("courtMode").value = "1";
+      document.getElementById("courtBCard").style.display = "none";
+      STATE.courts.A = STATE.players.slice();
+      STATE.courts.B = [];
+      scheduleCurrent(); renderRound(); renderLeaderboards();
+      return;
+    } else {
+      return; // abort build
+    }
+  }
+
+  STATE.round += 1;
+  STATE.courts.A = nextA; STATE.courts.B = nextB;
+  scheduleCurrent(); renderRound(); renderLeaderboards();
+}
+
+/* Submit/Resubmit */
+function submitScores(){
+  STATE.submittedAt[STATE.round] = new Date().toISOString();
+  renderLeaderboards();
+  alert(`Round ${STATE.round} submitted.`);
+}
+function resubmitScores(){
+  STATE.submittedAt[STATE.round] = new Date().toISOString();
+  renderLeaderboards();
+  alert(`Round ${STATE.round} re-submitted.`);
+}
+/* =========================
+   保存与加载 State
+   ========================= */
+function saveState() {
+  localStorage.setItem("padelSchedulerState", JSON.stringify(STATE));
+}
+
+function loadState() {
+  const raw = localStorage.getItem("padelSchedulerState");
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      Object.assign(STATE, parsed);
+    } catch(e) {
+      console.error("Failed to load state:", e);
+    }
+  }
+}
+
+/* Reset */
+function resetAll(){
+  if (!confirm("Reset everything?")) return;
+  STATE.round = 1;
+  STATE.players = [];
+  STATE.courts = { A: [], B: [] };
+  STATE.matchesPerPlayer = 4;
+  STATE.courtMode = "2";
+  STATE.strategy = "winnersTogether";
+  STATE.roster = {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}};
+  STATE.matches = {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}};
+  STATE.results = {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}};
+  STATE.submittedAt = {};
+  document.getElementById("playersInput").value = "";
+  document.getElementById("matchesPerPlayer").value = 4;
+  document.getElementById("courtMode").value = "2";
+  document.getElementById("strategy").value = "winnersTogether";
+  document.getElementById("courtBCard").style.display = "";
+  document.querySelector("#tblA tbody").innerHTML = "";
+  document.querySelector("#tblB tbody").innerHTML = "";
+  document.getElementById("lbPanels").innerHTML = "";
+  localStorage.removeItem("padelSchedulerState");
+}
+
+/* =========================
+   Wire up UI
+   ========================= */
+document.getElementById("btnGenerateR1").addEventListener("click", generateR1);
+  [
+  "btnGenerateR1",
+  "btnBuildNextRound",
+  "btnSubmit",
+  "btnResubmit",
+  "btnRecalcLB"
+].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener("click", saveState);
 });
 
-// === 下面直接保留你原来的脚本逻辑（省略，跟之前完全一致） ===
-// ...
+document.getElementById("btnBuildNextRound").addEventListener("click", buildNextRound);
+document.getElementById("btnSubmit").addEventListener("click", submitScores);
+document.getElementById("btnResubmit").addEventListener("click", resubmitScores);
+document.getElementById("btnRecalcLB").addEventListener("click", renderLeaderboards);
+document.getElementById("btnExportCSV").addEventListener("click", exportCSV);
+document.getElementById("btnReset").addEventListener("click", resetAll);
+
+/* Demo seed */
+document.getElementById("playersInput").value = ["Alice","Bob","Carol","Dave","Eve","Frank","Grace"].join(", ");
+window.addEventListener("DOMContentLoaded", () => {
+  loadState();
+  renderRound();
+  renderLeaderboards();
+});
+
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
