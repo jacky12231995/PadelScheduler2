@@ -535,6 +535,10 @@ function generateR1(){
 }
 
 function buildNextRound(){
+   // 同步最新 UI 选项（关键）
+  STATE.strategy = document.getElementById("strategy").value;
+  STATE.courtMode = document.getElementById("courtMode").value;
+  document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
   if (STATE.round >= 4) { alert("Already at round 4 (max)."); return; }
 
   function rankCourt(court){
@@ -669,6 +673,17 @@ function resetAll(){
 /* =========================
    Wire up UI
    ========================= */
+  document.getElementById("strategy").addEventListener("change", (e) => {
+  STATE.strategy = e.target.value;
+  saveState();
+});
+
+document.getElementById("courtMode").addEventListener("change", (e) => {
+  STATE.courtMode = e.target.value;
+  document.getElementById("courtBCard").style.display = e.target.value === "2" ? "" : "none";
+  saveState();
+});
+
 document.getElementById("btnGenerateR1").addEventListener("click", generateR1);
   [
   "btnGenerateR1",
@@ -699,6 +714,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
