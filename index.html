@@ -652,10 +652,16 @@ function loadState() {
     try {
       const parsed = JSON.parse(raw);
       Object.assign(STATE, parsed);
+    
+     // 🔥 同步到输入框
+      if (STATE.players.length > 0) {
+        document.getElementById("playersInput").value = STATE.players.join(", ");
+      }
     } catch(e) {
       console.error("Failed to load state:", e);
     }
   }
+}
 }/* =========================
    分享链接 & 生成二维码
    ========================= */
@@ -830,6 +836,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
