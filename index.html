@@ -128,7 +128,7 @@ input:disabled, select:disabled, textarea:disabled {
   <section class="card p-4">
     <div class="grid md:grid-cols-4 gap-4">
       <div class="md:col-span-2">
-        <label class="block text-sm font-medium mb-1">Players (comma-separated)</label>
+        <label class="block text-sm font-medium mb-1">Players (newline or comma-separated)</label>
         <textarea id="playersInput" rows="3" class="input" placeholder="Alice, Bob, Carol, Dave, Eve, ..."></textarea>
         <p class="text-xs text-slate-500 mt-1">Minimum 5 players. Odd counts are allowed (scheduler handles).</p>
       </div>
@@ -843,6 +843,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
