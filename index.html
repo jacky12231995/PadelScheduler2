@@ -517,7 +517,7 @@ function scheduleCurrent(){
 
 function generateR1(){
   try {
-    const raw = document.getElementById("playersInput").value.split(",");
+    const raw = document.getElementById("playersInput").value.split(/[\n,]+/);
     const players = ensureMinPlayers(raw);
     STATE.players = players;
     STATE.matchesPerPlayer = Math.max(1, Math.min(8, +document.getElementById("matchesPerPlayer").value || 4));
@@ -655,7 +655,7 @@ function loadState() {
     
      // 🔥 同步到输入框
       if (STATE.players.length > 0) {
-        document.getElementById("playersInput").value = STATE.players.join(", ");
+        document.getElementById("playersInput").value = STATE.players.join("\n");
       }
     } catch(e) {
       console.error("Failed to load state:", e);
@@ -843,6 +843,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
