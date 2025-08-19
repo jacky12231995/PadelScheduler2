@@ -436,25 +436,7 @@ function renderRoundBoard(r){
   const rows = Object.keys(st).map(p => ({ player: p, ...st[p] })).sort((a,b) => b.pts - a.pts || a.player.localeCompare(b.player));
   rows.forEach((row, i) => {
   const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
-
-  // 桌面端表格
-  tb.innerHTML += `<tr class="hidden sm:table-row">
-    <td>${i+1}</td>
-    <td>${cup}${row.player}</td>
-    <td>${row.court||"-"}</td>
-    <td>${row.pts}</td>
-    <td>${row.apps}</td>
-  </tr>`;
-
-  // 移动端卡片
-  const card = document.createElement("div");
-  card.className = "sm:hidden p-2 mb-2 rounded bg-slate-700";
-  card.innerHTML = `
-    <div class="font-semibold">${cup}${row.player}</div>
-    <div class="text-xs">Court: ${row.court||"-"}</div>
-    <div class="text-xs">Pts: ${row.pts}, Apps: ${row.apps}</div>
-  `;
-  wrap.appendChild(card);
+  tb.innerHTML += `<tr><td>${i+1}</td><td>${cup}${row.player}</td><td>${row.court||"-"}</td><td>${row.pts}</td><td>${row.apps}</td></tr>`;
 });
 
   return wrap;
@@ -481,30 +463,11 @@ function renderOverallBoard(){
     return { player: p, r1, r2, r3, r4, total };
   }).sort((a,b) => b.total - a.total || a.player.localeCompare(b.player));
 
-  rows.forEach((row, i) => {
+ rows.forEach((row, i) => {
   const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
-
-  // 桌面端表格
-  tb.innerHTML += `<tr class="hidden sm:table-row">
-    <td>${i+1}</td>
-    <td>${cup}${row.player}</td>
-    <td>${row.r1.pts}</td>
-    <td>${row.r2.pts}</td>
-    <td>${row.r3.pts}</td>
-    <td>${row.r4.pts}</td>
-    <td class="font-semibold">${row.total}</td>
-  </tr>`;
-
-  // 移动端卡片
-  const card = document.createElement("div");
-  card.className = "sm:hidden p-2 mb-2 rounded bg-slate-700";
-  card.innerHTML = `
-    <div class="font-semibold">${cup}${row.player}</div>
-    <div class="text-xs">R1: ${row.r1.pts}, R2: ${row.r2.pts}, R3: ${row.r3.pts}, R4: ${row.r4.pts}</div>
-    <div class="text-xs font-bold">Total: ${row.total}</div>
-  `;
-  wrap.appendChild(card);
+  tb.innerHTML += `<tr><td>${i+1}</td><td>${cup}${row.player}</td><td>${row.r1.pts}</td><td>${row.r2.pts}</td><td>${row.r3.pts}</td><td>${row.r4.pts}</td><td class="font-semibold">${row.total}</td></tr>`;
 });
+
 
   return wrap;
 }
@@ -867,6 +830,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
