@@ -253,12 +253,13 @@ input:disabled, select:disabled, textarea:disabled {
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
   <h2 class="font-semibold">Leaderboards</h2>
 
-   <!-- ✅ 单独一行按钮 -->
-  <div class="flex flex-col sm:flex-row gap-2 mb-3">
-    <button id="btnSubmit" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Submit Scores</button>
-    <button id="btnResubmit" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Resubmit</button>
-    <button id="btnRecalcLB" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Recalculate</button>
-  </div>
+  <!-- ✅ Leaderboards 按钮行 -->
+<div class="flex flex-col sm:flex-row gap-2 sm:justify-end mb-3">
+  <button id="btnSubmit" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Submit Scores</button>
+  <button id="btnResubmit" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Resubmit</button>
+  <button id="btnRecalcLB" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Recalculate</button>
+</div>
+
 
   <div id="lbPanels" class="space-y-6"></div>
 </section>
@@ -964,6 +965,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
