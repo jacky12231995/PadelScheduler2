@@ -46,21 +46,32 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;   /* ✅ 固定布局，避免列宽乱跳 */
   font-size: 0.95rem;
-  color: #f9fafb; /* 表格文字改亮色 */
+  color: #f9fafb;
 }
 .table th {
   background: linear-gradient(135deg, #1e293b, #0f172a);
   color: #f9fafb;
   font-weight: 600;
-  text-align: left;
+  text-align: center;   /* ✅ 居中更整齐 */
   padding: 0.5rem;
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 .table td {
+  text-align: center;
   padding: 0.5rem;
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
+
+/* ✅ 固定每列宽度，让 Court A / Court B 对齐 */
+.table th:nth-child(1), .table td:nth-child(1) { width: 8%; }   /* # */
+.table th:nth-child(2), .table td:nth-child(2) { width: 25%; }  /* Team 1 */
+.table th:nth-child(3), .table td:nth-child(3) { width: 25%; }  /* Team 2 */
+.table th:nth-child(4), .table td:nth-child(4) { width: 12%; }  /* T1 Games */
+.table th:nth-child(5), .table td:nth-child(5) { width: 12%; }  /* T2 Games */
+.table th:nth-child(6), .table td:nth-child(6) { width: 18%; }  /* Winner */
+
 .table tbody tr:hover {
   background: rgba(255,255,255,0.06);
 }
@@ -895,6 +906,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
