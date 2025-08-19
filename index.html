@@ -501,7 +501,10 @@ function renderRoundBoard(r){
   content.id = `lbContent${r}`;
   wrap.appendChild(content);
 
-  // ✅ 表格
+   // ✅ 表格（外面包一层 div，让小屏幕可横向滚动）
+  const scrollWrap = document.createElement("div");
+  scrollWrap.className = "overflow-x-auto";
+
   const table = document.createElement("table");
   table.className = "table mt-2";
   table.innerHTML = `
@@ -510,7 +513,9 @@ function renderRoundBoard(r){
     </thead>
     <tbody></tbody>
   `;
-  content.appendChild(table);
+
+  scrollWrap.appendChild(table);
+  content.appendChild(scrollWrap);
 
   // ✅ 填充数据
   const tb = table.querySelector("tbody");
@@ -541,9 +546,16 @@ function renderRoundBoard(r){
 function renderOverallBoard(){
   const wrap = document.createElement("div");
   wrap.innerHTML = `<h3 class="font-semibold">Overall Leaderboard</h3>`;
-  const table = document.createElement("table"); table.className = "table mt-2";
+    const scrollWrap = document.createElement("div");
+  scrollWrap.className = "overflow-x-auto";
+
+  const table = document.createElement("table"); 
+  table.className = "table mt-2";
   table.innerHTML = `<thead><tr><th>#</th><th>Player</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>Total</th></tr></thead><tbody></tbody>`;
-  wrap.appendChild(table);
+
+  scrollWrap.appendChild(table);
+  wrap.appendChild(scrollWrap);
+
   const tb = table.querySelector("tbody");
 
   const per = {};
@@ -940,6 +952,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
