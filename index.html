@@ -692,26 +692,45 @@ function renderOverallBoard(){
    ========================= */
 function exportCSV(){
   const rows = [];
-  const header = ["#", "Player", "R1 Pts", "R1 Apps", "R2 Pts", "R2 Apps", "R3 Pts", "R3 Apps", "R4 Pts", "R4 Apps", "Total"];
+  const header = [
+    "#", "Player",
+    "R1 Pts", "R1 Apps",
+    "R2 Pts", "R2 Apps",
+    "R3 Pts", "R3 Apps",
+    "R4 Pts", "R4 Apps",
+    "Total Points", "Total Apps"
+  ];
   rows.push(header);
+
   const per = {};
   STATE.players.forEach(p => per[p] = { r: [{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0}] });
   for (let r=1;r<=4;r++){
     const st = calcRoundStats(r);
     STATE.players.forEach(p => per[p].r[r-1] = st[p] ? { pts: st[p].pts, apps: st[p].apps } : { pts:0, apps:0 } );
   }
+
   const list = STATE.players.map(p => {
     const r1=per[p].r[0], r2=per[p].r[1], r3=per[p].r[2], r4=per[p].r[3];
-    const total = r1.pts + r2.pts + r3.pts + r4.pts;
-    return [p, r1.pts, r1.apps, r2.pts, r2.apps, r3.pts, r3.apps, r4.pts, r4.apps, total];
-  }).sort((a,b) => b[9]-a[9] || a[0].localeCompare(b[0]));
+    const totalPts  = r1.pts + r2.pts + r3.pts + r4.pts;
+    const totalApps = r1.apps + r2.apps + r3.apps + r4.apps;
+    return [p, r1.pts, r1.apps, r2.pts, r2.apps, r3.pts, r3.apps, r4.pts, r4.apps, totalPts, totalApps];
+  }).sort((a,b) => b[9]-a[9] || a[0].localeCompare(b[0])); // 依总分降序（索引9是 Total Points）
+
   list.forEach((r,i)=> rows.push([i+1, ...r]));
-  const csv = rows.map(r => r.map(c => { const s = String(c); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(",")).join("\n");
+
+  const csv = rows.map(r => r.map(c => {
+    const s = String(c);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(",")).join("\n");
+
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href = url; a.download = "Overall_Leaderboard.csv"; document.body.appendChild(a); a.click();
+  const a = document.createElement("a");
+  a.href = url; a.download = "Overall_Leaderboard.csv";
+  document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
 }
+
 
 /* =========================
    Generate / Build / Submit / Resubmit
@@ -1058,6 +1077,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
