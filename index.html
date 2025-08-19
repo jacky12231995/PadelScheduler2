@@ -64,6 +64,15 @@
 .table tbody tr:hover {
   background: rgba(255,255,255,0.06);
 }
+  /* 📱 Mobile 优化表格 */
+@media (max-width: 640px) {
+  .table td, .table th {
+    white-space: nowrap; /* 避免换行 */
+    padding: 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
 /* 输入框统一风格 */
 .input, textarea, select {
   background: rgba(30, 41, 59, 0.85);  /* 深蓝灰底 */
@@ -818,6 +827,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
