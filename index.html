@@ -263,6 +263,7 @@ input:disabled, select:disabled, textarea:disabled {
     
   <div id="lbPanels" class="space-y-6"></div>
 </section>
+    </section>
 <script>
 
 /* =========================
@@ -278,7 +279,7 @@ const STATE = {
   roster: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
   matches: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
   results: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
-  submittedAt: {}
+  submittedAt: {},
   partnerStats: {},   // ✅ 新增：搭档次数统计 { Alice: { Bob: 2, ... }, ... }
 
 };
@@ -583,23 +584,7 @@ function calcRoundStats(round){
   STATE.players.forEach(p => { if (!stats[p]) stats[p] = { pts:0, apps:0, court: (STATE.roster[round]?.A.includes(p) ? "A" : (STATE.roster[round]?.B.includes(p)? "B":"-")) }; });
   return stats;
 }
-  function recomputePartnerStatsFromAllMatches() {
-  STATE.partnerStats = {}; // 重置
-  for (let r = 1; r <= 4; r++) {
-    ["A", "B"].forEach(court => {
-      const matches = STATE.matches[r]?.[court] || [];
-      matches.forEach(m => {
-        const [t1, t2] = [m.t1 || [], m.t2 || []];
-        const pairs = [[t1[0], t1[1]], [t2[0], t2[1]]];
-        pairs.forEach(([a, b]) => {
-          if (!a || !b) return;
-          const key = [a, b].sort().join(" & ");
-          STATE.partnerStats[key] = (STATE.partnerStats[key] || 0) + 1;
-        });
-      });
-    });
-  }
-}
+
 
 function renderLeaderboards(){
   const host = document.getElementById("lbPanels");
@@ -1192,6 +1177,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
