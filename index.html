@@ -733,8 +733,8 @@ document.getElementById("btnShare").addEventListener("click", () => {
   const qrDiv = document.createElement("div");
   new QRCode(qrDiv, {
     text: url,
-    width: 220,
-    height: 220,
+    width: 300,
+    height: 300,
     colorDark: "#000000",
     colorLight: "#ffffff",
     correctLevel: QRCode.CorrectLevel.H
@@ -818,6 +818,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
