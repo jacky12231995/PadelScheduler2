@@ -542,7 +542,22 @@ function renderOverallBoard(){
 
   const table = document.createElement("table"); 
   table.className = "table mt-2";
-  table.innerHTML = `<thead><tr><th>#</th><th>Player</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>Total</th></tr></thead><tbody></tbody>`;
+  table.innerHTML = `
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>R1</th>
+      <th>R2</th>
+      <th>R3</th>
+      <th>R4</th>
+      <th>Total Points</th>
+      <th>Total Apps</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+`;
+
 
   scrollWrap.appendChild(table);
   wrap.appendChild(scrollWrap);
@@ -563,9 +578,21 @@ function renderOverallBoard(){
     return { player: p, r1, r2, r3, r4, total };
   }).sort((a,b) => b.total - a.total || a.player.localeCompare(b.player));
 
- rows.forEach((row, i) => {
+rows.forEach((row, i) => {
   const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
-  tb.innerHTML += `<tr><td>${i+1}</td><td>${cup}${row.player}</td><td>${row.r1.pts}</td><td>${row.r2.pts}</td><td>${row.r3.pts}</td><td>${row.r4.pts}</td><td class="font-semibold">${row.total}</td></tr>`;
+  const totalApps = row.r1.apps + row.r2.apps + row.r3.apps + row.r4.apps;
+  tb.innerHTML += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${cup}${row.player}</td>
+      <td>${row.r1.pts}</td>
+      <td>${row.r2.pts}</td>
+      <td>${row.r3.pts}</td>
+      <td>${row.r4.pts}</td>
+      <td class="font-semibold">${row.total}</td>
+      <td>${totalApps}</td>
+    </tr>
+  `;
 });
 
 
@@ -943,6 +970,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
