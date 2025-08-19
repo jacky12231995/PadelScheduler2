@@ -445,7 +445,7 @@ function renderRoundBoard(r){
   header.className = "flex items-center justify-between mb-1";
   header.innerHTML = `
   <div class="flex items-center gap-2">
-    <button class="toggle-btn text-lg" id="toggleLB${r}">▼</button>
+    <button class="toggle-btn text-lg" id="toggleLB${r}">🔽</button>
     <h3 class="font-semibold">Round ${r} Leaderboard</h3>
   </div>
 `;
@@ -483,10 +483,10 @@ function renderRoundBoard(r){
     const c = document.getElementById(`lbContent${r}`);
     if (c.style.display === "none") {
   c.style.display = "";
-  toggleBtn.textContent = "▼";  // 展开
+  toggleBtn.textContent = "🔽";  // 展开
 } else {
   c.style.display = "none";
-  toggleBtn.textContent = "▸";  // 收起
+  toggleBtn.textContent = "▶";  // 收起
 }
 
   });
@@ -895,6 +895,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
