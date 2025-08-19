@@ -709,25 +709,54 @@ document.getElementById("btnGenerateR1").addEventListener("click", generateR1);
   if (btn) btn.addEventListener("click", saveState);
 });
 document.getElementById("btnShare").addEventListener("click", () => {
-  const url = getShareURL(); // ✅ 改成生成带压缩STATE的URL
+  const url = getShareURL();
 
-  const qrContainer = document.getElementById("qrcode");
-  qrContainer.innerHTML = ""; 
+  // 创建遮罩层 + 模态框
+  const modal = document.createElement("div");
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.background = "rgba(0,0,0,0.6)";
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+  modal.style.zIndex = "9999";
 
-  try {
-    new QRCode(qrContainer, {
-      text: url,
-      width: 180,
-      height: 180,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.H
-    });
-    console.log("✅ QR 生成成功:", url);
-  } catch (err) {
-    console.error("❌ QR 生成失败:", err, "URL=", url);
-  }
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "10px";
+  box.style.textAlign = "center";
+
+  const qrDiv = document.createElement("div");
+  new QRCode(qrDiv, {
+    text: url,
+    width: 220,
+    height: 220,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  const closeBtn = document.createElement("button");
+  closeBtn.innerText = "Close";
+  closeBtn.style.marginTop = "10px";
+  closeBtn.style.padding = "6px 12px";
+  closeBtn.style.border = "none";
+  closeBtn.style.borderRadius = "6px";
+  closeBtn.style.background = "#334155";
+  closeBtn.style.color = "#fff";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.onclick = () => document.body.removeChild(modal);
+
+  box.appendChild(qrDiv);
+  box.appendChild(closeBtn);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
 });
+
 
 
 
@@ -789,6 +818,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
