@@ -767,6 +767,12 @@ const parsed = JSON.parse(restored);
       renderRound();
       renderLeaderboards();
 
+      // 🔥 保存到 localStorage
+      saveState();
+
+      // 🔥 移除 URL 参数（避免刷新时回退）
+      window.history.replaceState({}, document.title, window.location.pathname);
+
       return; // ⛔️ 避免 loadState 覆盖
     } catch(e) {
       console.error("❌ Failed to parse state from QR:", e);
@@ -783,6 +789,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
