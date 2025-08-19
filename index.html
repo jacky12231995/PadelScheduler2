@@ -115,10 +115,10 @@ input:disabled, select:disabled, textarea:disabled {
       <h1 class="text-2xl font-bold">Padel Scheduler</h1>
       <p class="text-sm text-slate-500">Supports ≥5 players · choose 1 or 2 courts · per-round balanced doubles</p>
     </div>
-  <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-  <button id="btnExportCSV" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Export Overall CSV</button>
-  <button id="btnReset" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Reset</button>
-  <button id="btnShare" class="btn w-full sm:w-auto px-4 py-2 text-sm sm:text-base">Share via QR</button>
+  <div class="flex gap-2">
+  <button id="btnExportCSV" class="btn px-4 py-2 text-sm sm:text-base">Export Overall CSV</button>
+  <button id="btnReset" class="btn px-4 py-2 text-sm sm:text-base">Reset</button>
+  <button id="btnShare" class="btn px-4 py-2 text-sm sm:text-base">Share via QR</button>
 </div>
 <div id="qrcode" class="mt-2"></div>
 
@@ -847,6 +847,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
