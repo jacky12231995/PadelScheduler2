@@ -64,13 +64,25 @@
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* ✅ 固定每列宽度，让 Court A / Court B 对齐 */
-.table th:nth-child(1), .table td:nth-child(1) { width: 8%; }   /* # */
-.table th:nth-child(2), .table td:nth-child(2) { width: 25%; }  /* Team 1 */
-.table th:nth-child(3), .table td:nth-child(3) { width: 25%; }  /* Team 2 */
-.table th:nth-child(4), .table td:nth-child(4) { width: 12%; }  /* T1 Games */
-.table th:nth-child(5), .table td:nth-child(5) { width: 12%; }  /* T2 Games */
-.table th:nth-child(6), .table td:nth-child(6) { width: 18%; }  /* Winner */
+/* ✅ 固定比赛表格 (#tblA / #tblB) 的列宽 */
+#tblA th:nth-child(1), #tblB th:nth-child(1),
+#tblA td:nth-child(1), #tblB td:nth-child(1) { width: 8%; }
+
+#tblA th:nth-child(2), #tblB th:nth-child(2),
+#tblA td:nth-child(2), #tblB td:nth-child(2) { width: 25%; }
+
+#tblA th:nth-child(3), #tblB th:nth-child(3),
+#tblA td:nth-child(3), #tblB td:nth-child(3) { width: 25%; }
+
+#tblA th:nth-child(4), #tblB th:nth-child(4),
+#tblA td:nth-child(4), #tblB td:nth-child(4) { width: 12%; }
+
+#tblA th:nth-child(5), #tblB th:nth-child(5),
+#tblA td:nth-child(5), #tblB td:nth-child(5) { width: 12%; }
+
+#tblA th:nth-child(6), #tblB th:nth-child(6),
+#tblA td:nth-child(6), #tblB td:nth-child(6) { width: 18%; }
+
 
 .table tbody tr:hover {
   background: rgba(255,255,255,0.06);
@@ -970,6 +982,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
