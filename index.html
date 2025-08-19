@@ -425,10 +425,18 @@ function calcRoundStats(round){
   return stats;
 }
 function renderLeaderboards(){
-  const host = document.getElementById("lbPanels"); host.innerHTML = "";
-  for (let r=1; r<=4; r++) host.appendChild(renderRoundBoard(r));
+  const host = document.getElementById("lbPanels");
+  host.innerHTML = "";
+
+  // ✅ 只渲染到当前轮次
+  for (let r = 1; r <= STATE.round; r++) {
+    host.appendChild(renderRoundBoard(r));
+  }
+
+  // ✅ 总榜永远显示
   host.appendChild(renderOverallBoard());
 }
+
 function renderRoundBoard(r){
   const wrap = document.createElement("div");
   wrap.innerHTML = `<h3 class="font-semibold">Round ${r} Leaderboard</h3>`;
@@ -847,6 +855,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
