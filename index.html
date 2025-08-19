@@ -284,6 +284,17 @@ const STATE = {
    ========================= */
 function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 function keyPair(a,b){ return [a,b].sort().join("|"); }
+// ✅ 比赛去重：把一场（两支队）做成固定字符串
+function matchKey(t1, t2){
+  const pk1 = keyPair(t1[0], t1[1]);         // 队内两人排序
+  const pk2 = keyPair(t2[0], t2[1]);
+  return [pk1, pk2].sort().join(" || ");      // 两队再排序，得到唯一键
+}
+
+// ✅ 记录“四人组”被用过几次（避免同一组四个人总是打在一起）
+function fourKey(t1, t2){
+  return [...t1, ...t2].slice().sort().join("|");
+}
 
 /* Validate players - allow >=5 (odd OK) */
 function ensureMinPlayers(list){
@@ -327,47 +338,51 @@ function base64ToUint8(base64) {
    ========================= */
 function scheduleCourt(players, K) {
   const N = players.length;
-  if (N < 4) return []; // UI 会在 2 场地模式下自动回退到 1 场地
+  if (N < 4) return [];
 
-  // 计算总场次数与每人目标至少 K，可能有少数人 K+1（使总出场数能被4整除）
+  // ---- 计算需要的“出场位”并把余数分散给前面几人（K 或 K+1）----
   const spotsMin = K * N;
   const matchesNeeded = Math.ceil(spotsMin / 4);
-  const totalSpots = matchesNeeded * 4;             // 实际要分配的“上场位”
-  const extras = totalSpots - spotsMin;             // 0~3
-  const shuffled = shuffle(players);
+  const totalSpots = matchesNeeded * 4;
+  const extras = totalSpots - spotsMin;
 
-  const target = {};  // 目标出场次数（K 或 K+1）
-  const need = {};    // 剩余需要的次数
-  const apps = {};    // 实际已安排次数（用于挑“垫场队员”）
-  for (let i=0;i<N;i++){
-    const p = shuffled[i];
+  const order = shuffle(players);
+  const target = {}, need = {}, apps = {};
+  for (let i = 0; i < N; i++) {
+    const p = order[i];
     target[p] = K + (i < extras ? 1 : 0);
-    need[p] = target[p];
-    apps[p] = 0;
+    need[p]   = target[p];
+    apps[p]   = 0;
   }
 
-  // 记录搭档/对手，尽量减少重复
   const partnerCount = new Map();
-  const vsCount = {};
-  players.forEach(p => vsCount[p] = {});
+  const vsCount = {}; players.forEach(p => vsCount[p] = {});
+  const seenMatches = new Set();
+  const fourCount = new Map();
+  const pairLastUsed = new Map();
+  const COOLDOWN = Math.max(3, Math.floor(matchesNeeded / 4));
 
   const matches = [];
   let guard = 0;
 
-  function pickFour(){
-    // 先选 need>0 的，优先 need 高、apps 低
+  function pickFour() {
     const needers = players
       .filter(p => need[p] > 0)
-      .sort((a,b) => (need[b]-need[a]) || (apps[a]-apps[b]) || a.localeCompare(b));
-
-    let pick = needers.slice(0,4);
-
-    // 不足4个，用“垫场队员”补齐：优先 apps 少、且没有被选中过
-    if (pick.length < 4){
+      .sort((a, b) =>
+        (need[b] - need[a]) ||
+        (apps[a] - apps[b]) ||
+        ((Math.random() < 0.5) ? -1 : 1)
+      );
+    let pick = needers.slice(0, 4);
+    if (pick.length < 4) {
       const boosters = players
         .filter(p => !pick.includes(p))
-        .sort((a,b) => (apps[a]-apps[b]) || (need[b]-need[a]) || a.localeCompare(b));
-      for (const p of boosters){
+        .sort((a, b) =>
+          (apps[a] - apps[b]) ||
+          (need[b] - need[a]) ||
+          ((Math.random() < 0.5) ? -1 : 1)
+        );
+      for (const p of boosters) {
         pick.push(p);
         if (pick.length === 4) break;
       }
@@ -375,47 +390,96 @@ function scheduleCourt(players, K) {
     return pick.length === 4 ? pick : [];
   }
 
-  while (Object.values(need).some(v=>v>0) && guard++ < 5000){
-    const cand = pickFour();
+  while (Object.values(need).some(v => v > 0) && guard++ < 8000) {
+    let cand = pickFour();
     if (cand.length < 4) break;
 
-    // 三种可能的搭配，选重复最少的
-    const partitions = [
-      [[cand[0], cand[1]], [cand[2], cand[3]]],
-      [[cand[0], cand[2]], [cand[1], cand[3]]],
-      [[cand[0], cand[3]], [cand[1], cand[2]]]
-    ];
+    let chosen = null;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const partitions = [
+        [[cand[0], cand[1]], [cand[2], cand[3]]],
+        [[cand[0], cand[2]], [cand[1], cand[3]]],
+        [[cand[0], cand[3]], [cand[1], cand[2]]],
+      ];
 
-    let best = null, bestScore = Infinity;
-    for (const [t1, t2] of partitions) {
-      const pk1 = keyPair(t1[0], t1[1]);
-      const pk2 = keyPair(t2[0], t2[1]);
-      let score = (partnerCount.get(pk1) || 0) * 100 + (partnerCount.get(pk2) || 0) * 100;
-      for (const a of t1) for (const b of t2) score += (vsCount[a][b] || 0) * 10;
-      if (score < bestScore) { bestScore = score; best = { t1, t2 }; }
+      let best = null, bestScore = Infinity;
+      for (const [t1, t2] of partitions) {
+        const pk1 = keyPair(t1[0], t1[1]);
+        const pk2 = keyPair(t2[0], t2[1]);
+        let score =
+          (partnerCount.get(pk1) || 0) * 1200 +
+          (partnerCount.get(pk2) || 0) * 1200;
+        for (const a of t1) for (const b of t2) {
+          score += (vsCount[a][b] || 0) * 45;
+        }
+        score += (fourCount.get(fourKey(t1, t2)) || 0) * 300;
+        const last1 = pairLastUsed.get(pk1);
+        const last2 = pairLastUsed.get(pk2);
+        if (last1 != null && matches.length - last1 < COOLDOWN) score += 5000;
+        if (last2 != null && matches.length - last2 < COOLDOWN) score += 5000;
+        if (seenMatches.has(matchKey(t1, t2))) score += 1e8;
+        if (score < bestScore) { bestScore = score; best = { t1, t2 }; }
+      }
+      if (!seenMatches.has(matchKey(best.t1, best.t2))) {
+        chosen = best; break;
+      }
+      if (attempt < 3) { cand.push(cand.shift()); }
+      else {
+        const outIdx = cand.map((p,i)=>({p,i}))
+                           .sort((x,y)=>apps[y.p]-apps[x.p])[0].i;
+        const pool = players
+          .filter(p => !cand.includes(p))
+          .sort((a,b)=>(apps[a]-apps[b])||((Math.random()<0.5)?-1:1));
+        if (pool.length) cand[outIdx] = pool[0];
+      }
     }
 
-    matches.push(best);
+    if (!chosen) {
+      const partitions = [
+        [[cand[0], cand[1]], [cand[2], cand[3]]],
+        [[cand[0], cand[2]], [cand[1], cand[3]]],
+        [[cand[0], cand[3]], [cand[1], cand[2]]],
+      ];
+      let best = null, bestSeen = Infinity, bestScore = Infinity;
+      for (const [t1, t2] of partitions) {
+        const mKey = matchKey(t1, t2);
+        const seenTimes = seenMatches.has(mKey) ? 1 : 0;
+        const pk1 = keyPair(t1[0], t1[1]);
+        const pk2 = keyPair(t2[0], t2[1]);
+        let score =
+          (partnerCount.get(pk1) || 0) * 1200 +
+          (partnerCount.get(pk2) || 0) * 1200 +
+          (fourCount.get(fourKey(t1, t2)) || 0) * 300;
+        if (seenTimes < bestSeen || (seenTimes === bestSeen && score < bestScore)) {
+          bestSeen = seenTimes; bestScore = score; best = { t1, t2 };
+        }
+      }
+      chosen = best;
+    }
 
-    // 更新计数
-    const four = [...best.t1, ...best.t2];
-    for (const p of four){
+    matches.push(chosen);
+    const mk = matchKey(chosen.t1, chosen.t2);
+    seenMatches.add(mk);
+    fourCount.set(fourKey(chosen.t1, chosen.t2), (fourCount.get(fourKey(chosen.t1, chosen.t2)) || 0) + 1);
+    const pk1 = keyPair(chosen.t1[0], chosen.t1[1]);
+    const pk2 = keyPair(chosen.t2[0], chosen.t2[1]);
+    partnerCount.set(pk1, (partnerCount.get(pk1) || 0) + 1);
+    partnerCount.set(pk2, (partnerCount.get(pk2) || 0) + 1);
+    pairLastUsed.set(pk1, matches.length - 1);
+    pairLastUsed.set(pk2, matches.length - 1);
+    for (const a of chosen.t1) for (const b of chosen.t2) {
+      vsCount[a][b] = (vsCount[a][b] || 0) + 1;
+      vsCount[b][a] = (vsCount[b][a] || 0) + 1;
+    }
+    [...chosen.t1, ...chosen.t2].forEach(p => {
       apps[p] += 1;
-      if (need[p] > 0) need[p] -= 1; // 只有未达标的人才扣 need
-    }
-
-    const pk1 = keyPair(best.t1[0], best.t1[1]);
-    const pk2 = keyPair(best.t2[0], best.t2[1]);
-    partnerCount.set(pk1, (partnerCount.get(pk1)||0)+1);
-    partnerCount.set(pk2, (partnerCount.get(pk2)||0)+1);
-    for (const a of best.t1) for (const b of best.t2) {
-      vsCount[a][b] = (vsCount[a][b]||0) + 1;
-      vsCount[b][a] = (vsCount[b][a]||0) + 1;
-    }
+      if (need[p] > 0) need[p] -= 1;
+    });
   }
 
   return matches;
 }
+
 
 /* =========================
    Render: rounds & leaderboards
@@ -963,6 +1027,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
