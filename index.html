@@ -626,7 +626,22 @@ function renderOverallBoard(){
 
   const table = document.createElement("table"); 
   table.className = "table mt-2";
-  table.innerHTML = `<thead><tr><th>#</th><th>Player</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>Total</th></tr></thead><tbody></tbody>`;
+  table.innerHTML = `
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>R1</th>
+      <th>R2</th>
+      <th>R3</th>
+      <th>R4</th>
+      <th>Total Points</th>   <!-- ✅ 新增 -->
+      <th>Total Apps</th>     <!-- ✅ 新增 -->
+    </tr>
+  </thead>
+  <tbody></tbody>
+`;
+
 
   scrollWrap.appendChild(table);
   wrap.appendChild(scrollWrap);
@@ -1027,6 +1042,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
