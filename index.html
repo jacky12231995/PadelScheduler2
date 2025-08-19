@@ -64,14 +64,6 @@
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* ✅ 固定每列宽度，让 Court A / Court B 对齐 */
-.table th:nth-child(1), .table td:nth-child(1) { width: 8%; }   /* # */
-.table th:nth-child(2), .table td:nth-child(2) { width: 25%; }  /* Team 1 */
-.table th:nth-child(3), .table td:nth-child(3) { width: 25%; }  /* Team 2 */
-.table th:nth-child(4), .table td:nth-child(4) { width: 12%; }  /* T1 Games */
-.table th:nth-child(5), .table td:nth-child(5) { width: 12%; }  /* T2 Games */
-.table th:nth-child(6), .table td:nth-child(6) { width: 18%; }  /* Winner */
-
 .table tbody tr:hover {
   background: rgba(255,255,255,0.06);
 }
@@ -157,6 +149,16 @@ input:disabled, select:disabled, textarea:disabled {
     max-width: 100%;  /* 小屏手机撑满 */
     margin: 0;
   }
+}
+/* ✅ 让 Leaderboard 表格不受 6 列定宽影响 */
+.leaderboard-container .table {
+  table-layout: auto;      /* 自适应列宽 */
+  min-width: 760px;        /* 小屏可横向滚动时的最小宽度 */
+}
+.leaderboard-container .table th,
+.leaderboard-container .table td {
+  width: auto;             /* 解除列宽限制 */
+  white-space: nowrap;     /* 避免换行挤占空间 */
 }
 
 </style>
@@ -621,55 +623,69 @@ function renderRoundBoard(r){
 function renderOverallBoard(){
   const wrap = document.createElement("div");
   wrap.innerHTML = `<h3 class="font-semibold">Overall Leaderboard</h3>`;
-    const scrollWrap = document.createElement("div");
+
+  const scrollWrap = document.createElement("div");
   scrollWrap.className = "overflow-x-auto";
 
   const table = document.createElement("table"); 
   table.className = "table mt-2";
   table.innerHTML = `
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Player</th>
-      <th>R1</th>
-      <th>R2</th>
-      <th>R3</th>
-      <th>R4</th>
-      <th>Total Points</th>   <!-- ✅ 新增 -->
-      <th>Total Apps</th>     <!-- ✅ 新增 -->
-    </tr>
-  </thead>
-  <tbody></tbody>
-`;
-
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>R1</th>
+        <th>R2</th>
+        <th>R3</th>
+        <th>R4</th>
+        <th>Total Points</th>
+        <th>Total Apps</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
 
   scrollWrap.appendChild(table);
   wrap.appendChild(scrollWrap);
 
   const tb = table.querySelector("tbody");
 
+  // 聚合每人每轮
   const per = {};
   STATE.players.forEach(p => per[p] = { r: [{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0},{pts:0,apps:0}] });
 
   for (let r=1; r<=4; r++){
     const st = calcRoundStats(r);
-    STATE.players.forEach(p => per[p].r[r-1] = st[p] ? { pts: st[p].pts, apps: st[p].apps } : { pts:0, apps:0 } );
+    STATE.players.forEach(p => {
+      per[p].r[r-1] = st[p] ? { pts: st[p].pts, apps: st[p].apps } : { pts:0, apps:0 };
+    });
   }
 
   const rows = STATE.players.map(p => {
     const r1=per[p].r[0], r2=per[p].r[1], r3=per[p].r[2], r4=per[p].r[3];
-    const total = r1.pts + r2.pts + r3.pts + r4.pts;
-    return { player: p, r1, r2, r3, r4, total };
-  }).sort((a,b) => b.total - a.total || a.player.localeCompare(b.player));
+    const totalPts  = r1.pts + r2.pts + r3.pts + r4.pts;
+    const totalApps = r1.apps + r2.apps + r3.apps + r4.apps;
+    return { player: p, r1, r2, r3, r4, totalPts, totalApps };
+  }).sort((a,b) => b.totalPts - a.totalPts || a.player.localeCompare(b.player));
 
- rows.forEach((row, i) => {
-  const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
-  tb.innerHTML += `<tr><td>${i+1}</td><td>${cup}${row.player}</td><td>${row.r1.pts}</td><td>${row.r2.pts}</td><td>${row.r3.pts}</td><td>${row.r4.pts}</td><td class="font-semibold">${row.total}</td></tr>`;
-});
-
+  rows.forEach((row, i) => {
+    const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
+    tb.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${cup}${row.player}</td>
+        <td>${row.r1.pts}</td>
+        <td>${row.r2.pts}</td>
+        <td>${row.r3.pts}</td>
+        <td>${row.r4.pts}</td>
+        <td class="font-semibold">${row.totalPts}</td>
+        <td>${row.totalApps}</td>
+      </tr>`;
+  });
 
   return wrap;
 }
+
 
 /* =========================
    Export CSV (Overall)
@@ -1042,6 +1058,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
