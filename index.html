@@ -154,19 +154,23 @@ input:disabled, select:disabled, textarea:disabled {
         </select>
       </div>
 
-      <div class="md:col-span-4">
-        <button id="btnGenerateR1" class="btn btn-primary mt-2 px-4 py-2 text-sm sm:text-base">Generate Round 1</button>
-      </div>
+     <div class="md:col-span-4 flex">
+  <button id="btnGenerateR1" class="btn w-full sm:w-auto btn-primary mt-2 px-4 py-2 text-sm sm:text-base">
+    Generate Round 1
+  </button>
+</div>
     </div>
   </section>
 
   <!-- Rounds -->
   <section class="grid md:grid-cols-2 gap-6">
     <div class="card p-4">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-semibold">Round <span id="labelRoundA">1</span> — Court A</h2>
-        <button id="btnBuildNextRound" class="btn btn-primary px-4 py-2 text-sm sm:text-base">Build Next Round</button>
-      </div>
+     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+  <h2 class="font-semibold">Round <span id="labelRoundA">1</span> — Court A</h2>
+  <button id="btnBuildNextRound" class="btn w-full sm:w-auto btn-primary px-4 py-2 text-sm sm:text-base">
+    Build Next Round
+  </button>
+</div>
       <div class="overflow-x-auto">
         <table class="table" id="tblA">
           <thead><tr><th>#</th><th>Team 1</th><th>Team 2</th><th>T1 Games</th><th>T2 Games</th><th>Winner</th></tr></thead>
@@ -843,6 +847,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
