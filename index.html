@@ -439,8 +439,32 @@ function renderLeaderboards(){
 
 function renderRoundBoard(r){
   const wrap = document.createElement("div");
-  wrap.innerHTML = `<h3 class="font-semibold">Round ${r} Leaderboard</h3>`;
-  const table = document.createElement("table"); table.className = "table mt-2";
+
+// ✅ header + toggle 按钮
+const header = document.createElement("div");
+header.className = "flex items-center justify-between mb-1";
+header.innerHTML = `
+  <h3 class="font-semibold">Round ${r} Leaderboard</h3>
+  <button class="btn px-2 py-1 text-xs" id="toggleLB${r}">Collapse</button>
+`;
+wrap.appendChild(header);
+
+// ✅ 内容区域（默认展开）
+const content = document.createElement("div");
+content.id = `lbContent${r}`;
+wrap.appendChild(content);
+
+// ✅ 表格
+const table = document.createElement("table");
+table.className = "table mt-2";
+table.innerHTML = `
+  <thead>
+    <tr><th>#</th><th>Player</th><th>Court</th><th>Pts</th><th>Apps</th></tr>
+  </thead>
+  <tbody></tbody>
+`;
+content.appendChild(table);
+
   table.innerHTML = `<thead><tr><th>#</th><th>Player</th><th>Court</th><th>Pts</th><th>Apps</th></tr></thead><tbody></tbody>`;
   wrap.appendChild(table);
   const tb = table.querySelector("tbody");
@@ -449,6 +473,18 @@ function renderRoundBoard(r){
   rows.forEach((row, i) => {
   const cup = i===0 ? "🏆 " : i===1 ? "🥈 " : i===2 ? "🥉 " : "";
   tb.innerHTML += `<tr><td>${i+1}</td><td>${cup}${row.player}</td><td>${row.court||"-"}</td><td>${row.pts}</td><td>${row.apps}</td></tr>`;
+});
+// ✅ 折叠 / 展开逻辑
+const toggleBtn = header.querySelector(`#toggleLB${r}`);
+toggleBtn.addEventListener("click", () => {
+  const c = document.getElementById(`lbContent${r}`);
+  if (c.style.display === "none") {
+    c.style.display = "";
+    toggleBtn.textContent = "Collapse";
+  } else {
+    c.style.display = "none";
+    toggleBtn.textContent = "Expand";
+  }
 });
 
   return wrap;
@@ -855,6 +891,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
