@@ -279,6 +279,8 @@ const STATE = {
   matches: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
   results: {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}},
   submittedAt: {}
+  partnerStats: {},   // ✅ 新增：搭档次数统计 { Alice: { Bob: 2, ... }, ... }
+
 };
 
 /* =========================
@@ -334,6 +336,40 @@ function base64ToUint8(base64) {
   }
   return bytes;
 }
+
+  /* =========================
+   Partner stats helpers
+   ========================= */
+
+// 把一场比赛里的两支队更新到 partnerStats
+function updatePartnerStats(t1, t2){
+  const teams = [t1 || [], t2 || []];
+  teams.forEach(team => {
+    // team 里任意两人都算搭档+1
+    for (let i=0; i<team.length; i++){
+      for (let j=i+1; j<team.length; j++){
+        const a = team[i], b = team[j];
+        if (!a || !b) continue;
+        if (!STATE.partnerStats[a]) STATE.partnerStats[a] = {};
+        if (!STATE.partnerStats[b]) STATE.partnerStats[b] = {};
+        STATE.partnerStats[a][b] = (STATE.partnerStats[a][b] || 0) + 1;
+        STATE.partnerStats[b][a] = (STATE.partnerStats[b][a] || 0) + 1;
+      }
+    }
+  });
+}
+
+// 从所有 rounds 的 matches 重新计算一遍（用于加载老数据或容错）
+function recomputePartnerStatsFromAllMatches(){
+  STATE.partnerStats = {};
+  for (let r = 1; r <= 4; r++){
+    ["A","B"].forEach(court => {
+      const arr = STATE.matches?.[r]?.[court] || [];
+      arr.forEach(m => updatePartnerStats(m.t1, m.t2));
+    });
+  }
+}
+
 
 /* =========================
    Optimized scheduling
@@ -477,6 +513,7 @@ function scheduleCourt(players, K) {
       apps[p] += 1;
       if (need[p] > 0) need[p] -= 1;
     });
+    updatePartnerStats(chosen.t1, chosen.t2);   // ✅ 新增：每生成一场就累计搭档
   }
 
   return matches;
@@ -557,6 +594,9 @@ function renderLeaderboards(){
 
   // ✅ 总榜永远显示
   host.appendChild(renderOverallBoard());
+  // ✅ 搭档矩阵
+host.appendChild(renderPartnerMatrix());
+
 }
 
 function renderRoundBoard(r){
@@ -685,6 +725,59 @@ function renderOverallBoard(){
 
   return wrap;
 }
+/* =========================
+   Render: Partner Matrix
+   ========================= */
+function renderPartnerMatrix(){
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<h3 class="font-semibold mt-4">Partner Matrix</h3>`;
+
+  const players = STATE.players.slice();
+  // 计算最大值用于着色归一化
+  let maxVal = 0;
+  players.forEach(a => players.forEach(b => {
+    if (a===b) return;
+    const v = STATE.partnerStats?.[a]?.[b] || 0;
+    if (v > maxVal) maxVal = v;
+  }));
+
+  function cellBg(v){
+    if (!maxVal) return "rgba(148,163,184,0.08)"; // slate-400 很淡
+    const alpha = 0.12 + 0.88 * (v / maxVal);     // 0.12 ~ 1.0
+    return `rgba(34,197,94,${alpha})`;            // 绿色系（Tailwind green-500 的 HSL 近似）
+  }
+
+  const scroll = document.createElement("div");
+  scroll.className = "overflow-x-auto";
+  const table = document.createElement("table");
+  table.className = "table mt-2";
+
+  // 构建表头
+  let html = "<thead><tr><th>Player</th>";
+  players.forEach(p => html += `<th>${p}</th>`);
+  html += "</tr></thead><tbody>";
+
+  // 构建主体
+  players.forEach(rowP => {
+    html += `<tr><td>${rowP}</td>`;
+    players.forEach(colP => {
+      if (rowP === colP){
+        html += `<td style="background: rgba(100,116,139,0.15)">—</td>`;
+      } else {
+        const val = STATE.partnerStats?.[rowP]?.[colP] || 0;
+        const bg = cellBg(val);
+        html += `<td title="${rowP} × ${colP}: ${val}" style="background:${bg}; font-weight:600;">${val}</td>`;
+      }
+    });
+    html += "</tr>";
+  });
+
+  html += "</tbody>";
+  table.innerHTML = html;
+  scroll.appendChild(table);
+  wrap.appendChild(scroll);
+  return wrap;
+}
 
 
 /* =========================
@@ -770,7 +863,7 @@ function generateR1(){
     } else {
       document.getElementById("courtBCard").style.display = STATE.courtMode === "2" ? "" : "none";
     }
-
+    STATE.partnerStats = {};    // ✅ 新增：重新开始统计
     scheduleCurrent();
     renderRound();
     renderLeaderboards();
@@ -923,6 +1016,7 @@ function resetAll(){
   STATE.matches = {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}};
   STATE.results = {1:{A:[],B:[]},2:{A:[],B:[]},3:{A:[],B:[]},4:{A:[],B:[]}};
   STATE.submittedAt = {};
+  STATE.partnerStats = {};   // ✅ 新增
   document.getElementById("playersInput").value = "";
   document.getElementById("matchesPerPlayer").value = 4;
   document.getElementById("courtMode").value = "2";
@@ -1042,6 +1136,8 @@ const parsed = JSON.parse(restored);
       Object.assign(STATE, parsed);
       console.log("✅ State restored from QR", STATE);
 
+      recomputePartnerStatsFromAllMatches();   // 🔥 补算搭档统计，兼容老数据
+
       // 🔥 同步 UI 输入框
       document.getElementById("playersInput").value = STATE.players.join(", ");
       document.getElementById("matchesPerPlayer").value = STATE.matchesPerPlayer;
@@ -1069,6 +1165,7 @@ const parsed = JSON.parse(restored);
 
   // ✅ 如果没有二维码参数，则从 localStorage 恢复
   loadState();
+  recomputePartnerStatsFromAllMatches();   // ✅ 新增
   renderRound();
   renderLeaderboards();
 });
@@ -1077,6 +1174,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
