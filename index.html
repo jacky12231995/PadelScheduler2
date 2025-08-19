@@ -101,8 +101,10 @@
   background: rgba(51, 65, 85, 0.95);
 }
 .scoreInput {
-  width: 4rem;
+  width: 3.25rem;      /* 更适合手机宽度 */
   text-align: center;
+  font-size: 0.85rem;
+  padding: 0.25rem;
 }
 
 /* 禁用的下拉/输入框 */
@@ -110,6 +112,38 @@ input:disabled, select:disabled, textarea:disabled {
   background: rgba(30, 41, 59, 0.6);
   color: #94a3b8; /* 更浅的灰字 */
   cursor: not-allowed;
+}
+/* ---- Fix: prevent header/input overlap on mobile ---- */
+.table {
+  table-layout: fixed;           /* 列宽固定，避免压扁后文字互相覆盖 */
+}
+
+/* 超过列宽时省略号，避免挤到相邻列 */
+.table th, .table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 指定几列的最小宽度（两张比赛表：#tblA 和 #tblB） */
+#tblA th:nth-child(1), #tblB th:nth-child(1),
+#tblA td:nth-child(1), #tblB td:nth-child(1) { width: 2.5rem; }   /* # */
+
+#tblA th:nth-child(2), #tblB th:nth-child(2),
+#tblA td:nth-child(2), #tblB td:nth-child(2),
+#tblA th:nth-child(3), #tblB th:nth-child(3),
+#tblA td:nth-child(3), #tblB td:nth-child(3) { min-width: 8.5rem; } /* Team 1 / Team 2 */
+
+#tblA th:nth-child(4), #tblB th:nth-child(4),
+#tblA td:nth-child(4), #tblB td:nth-child(4),
+#tblA th:nth-child(5), #tblB th:nth-child(5),
+#tblA td:nth-child(5), #tblB td:nth-child(5) { width: 4.2rem; }   /* T1/T2 Games */
+
+#tblA th:nth-child(6), #tblB th:nth-child(6),
+#tblA td:nth-child(6), #tblB td:nth-child(6) { width: 5.5rem; }   /* Winner */
+
+/* 📱 在手机上让表格走横向滚动，别再把列挤爆 */
+@media (max-width: 640px) {
+  .table { min-width: 720px; }   /* 强制最小宽度，容器会横向滚动 */
 }
 
 </style>
@@ -392,8 +426,8 @@ function renderCourt(court, tableId){
       <td>${idx+1}</td>
       <td>${(m.t1||[]).join(" & ")}</td>
       <td>${(m.t2||[]).join(" & ")}</td>
-      <td><input data-which="g1" data-court="${court}" data-idx="${idx}" type="number" min="0" class="input" style="width:5.5rem" value="${res.g1}"></td>
-      <td><input data-which="g2" data-court="${court}" data-idx="${idx}" type="number" min="0" class="input" style="width:5.5rem" value="${res.g2}"></td>
+      <td><input data-which="g1" data-court="${court}" data-idx="${idx}" type="number" min="0" class="input scoreInput" value="${res.g1}"></td>
+<td><input data-which="g2" data-court="${court}" data-idx="${idx}" type="number" min="0" class="input scoreInput" value="${res.g2}"></td>
       <td>${winnerBadge(res.g1, res.g2)}</td>
     `;
     tbody.appendChild(tr);
@@ -906,6 +940,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
