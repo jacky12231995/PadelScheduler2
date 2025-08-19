@@ -145,6 +145,19 @@ input:disabled, select:disabled, textarea:disabled {
 @media (max-width: 640px) {
   .table { min-width: 720px; }   /* 强制最小宽度，容器会横向滚动 */
 }
+/* Leaderboard 宽度控制 */
+.leaderboard-container {
+  max-width: 900px;   /* 桌面端保持和上面表格差不多 */
+  margin: 0 auto;     /* 居中 */
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .leaderboard-container {
+    max-width: 100%;  /* 小屏手机撑满 */
+    margin: 0;
+  }
+}
 
 </style>
 
@@ -235,7 +248,8 @@ input:disabled, select:disabled, textarea:disabled {
     </div>
 
   <!-- Leaderboards -->
-  <section class="card p-4 md:col-span-2">
+    <!-- Leaderboards -->
+  <section class="card p-4 md:col-span-2 leaderboard-container">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
   <h2 class="font-semibold">Leaderboards</h2>
   <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -951,6 +965,7 @@ const parsed = JSON.parse(restored);
 </script>
 </body>
 </html>
+
 
 
 
